@@ -70,3 +70,4 @@ frontend/build/
 frontend/.turbo/
 frontend/*.tsbuildinfo
 frontend/.env*.local
+!frontend/src/lib/
