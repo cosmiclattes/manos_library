@@ -26,6 +26,12 @@ export default function DashboardPage() {
         router.push('/member');
         return;
       }
+
+      // Redirect librarians and super_admins to the librarian page
+      if (userData.user_type === 'librarian' || userData.user_type === 'super_admin') {
+        router.push('/librarian');
+        return;
+      }
     } catch (err) {
       // Not authenticated, redirect to home
       router.push('/');
