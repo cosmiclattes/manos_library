@@ -123,6 +123,81 @@ Authorization: Bearer YOUR_ACCESS_TOKEN
 
 ---
 
+### Search Books
+
+**Endpoint**: `GET /books/search/`
+
+**Authentication**: Required (All users)
+
+**Description**: Search for books by title and/or author with case-insensitive partial matching
+
+**Query Parameters**:
+- `title` (optional): Search term for book title (partial match)
+- `author` (optional): Search term for author name (partial match)
+- `skip` (optional): Number of records to skip (default: 0)
+- `limit` (optional): Maximum number of records to return (default: 100)
+
+**Note**: At least one search parameter (title or author) must be provided
+
+**Examples**:
+
+Search by title only:
+```
+GET /books/search/?title=gatsby
+```
+
+Search by author only:
+```
+GET /books/search/?author=orwell
+```
+
+Search by both (must match both):
+```
+GET /books/search/?title=1984&author=george
+```
+
+Partial matches work:
+```
+GET /books/search/?title=kill    # Matches "To Kill a Mockingbird"
+GET /books/search/?author=lee    # Matches "Harper Lee", "Stan Lee", etc.
+```
+
+**Response**: `200 OK`
+```json
+[
+  {
+    "id": 1,
+    "title": "The Great Gatsby",
+    "author": "F. Scott Fitzgerald",
+    "publisher": "Scribner",
+    "summary": "A story of wealth and tragedy in 1920s America",
+    "genre": "Fiction",
+    "year_of_publishing": 1925,
+    "inventory": {
+      "id": 1,
+      "book_id": 1,
+      "total_copies": 5,
+      "borrowed_copies": 2
+    },
+    "available_copies": 3
+  }
+]
+```
+
+**Empty result** (no matches):
+```json
+[]
+```
+
+**Error** (no search parameters):
+```json
+{
+  "detail": "At least one search parameter (title or author) is required"
+}
+```
+
+---
+
 ### Get Book Details
 
 **Endpoint**: `GET /books/{book_id}`

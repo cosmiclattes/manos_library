@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from typing import List
+from sqlalchemy import or_
+from typing import List, Optional
 from app.database import get_db
 from app.models.models import Book, BookInventory, User
 from app.schemas.schemas import BookCreate, BookUpdate, BookResponse, BookWithInventory
@@ -37,6 +38,59 @@ def list_books(
 
     books = query.offset(skip).limit(limit).all()
 
+    result = []
+    for book in books:
+        book_data = BookWithInventory.model_validate(book)
+        if book.inventory:
+            book_data.available_copies = book.inventory.total_copies - book.inventory.borrowed_copies
+        result.append(book_data)
+
+    return result
+
+
+@router.get("/search/", response_model=List[BookWithInventory])
+def search_books(
+    title: Optional[str] = Query(None, description="Search by book title (partial match)"),
+    author: Optional[str] = Query(None, description="Search by author name (partial match)"),
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Search for books by title and/or author with partial matching.
+
+    - **title**: Search term for book title (case-insensitive partial match)
+    - **author**: Search term for author name (case-insensitive partial match)
+    - If both provided, returns books matching BOTH criteria
+    - If only one provided, returns books matching that criterion
+    - Returns empty list if no search terms provided
+    """
+
+    if not title and not author:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="At least one search parameter (title or author) is required"
+        )
+
+    query = db.query(Book)
+
+    # Build search filters
+    filters = []
+    if title:
+        filters.append(Book.title.ilike(f"%{title}%"))
+    if author:
+        filters.append(Book.author.ilike(f"%{author}%"))
+
+    # Apply filters with AND logic (both must match if both provided)
+    if len(filters) == 1:
+        query = query.filter(filters[0])
+    else:
+        query = query.filter(*filters)
+
+    books = query.offset(skip).limit(limit).all()
+
+    # Build response with inventory info
     result = []
     for book in books:
         book_data = BookWithInventory.model_validate(book)
