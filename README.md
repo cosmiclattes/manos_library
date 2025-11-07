@@ -4,22 +4,33 @@ A comprehensive library management web application built with FastAPI, SQLAlchem
 
 ## Features
 
+- **Modern Web UI**: Beautiful, responsive Next.js frontend with shadcn/ui components
 - **User Management**: Three user types (Super Admin, Librarian, Member) with role-based access control
 - **Book Management**: Create, edit, and list books (Librarian access required)
+- **Book Search**: Search books by title or author with partial matching
 - **Inventory Management**: Track book copies and availability (Librarian access required)
 - **Borrow/Return System**: Users can borrow and return books with automatic inventory updates
 - **Google SSO**: Secure authentication using Google OAuth
 - **Database Migrations**: Version-controlled database changes using Alembic
-- **Automatic Database Setup**: Docker initialization script automatically creates database and user
+- **RESTful API**: Comprehensive FastAPI backend with auto-generated documentation
 
 ## Tech Stack
 
+### Backend
 - **FastAPI**: Modern Python web framework
 - **SQLAlchemy**: SQL toolkit and ORM
 - **PostgreSQL**: Relational database
 - **Alembic**: Database migration tool
 - **Google OAuth**: Authentication provider
 - **Pydantic**: Data validation using Python type annotations
+
+### Frontend
+- **Next.js 14**: React framework with App Router
+- **React 18**: UI library
+- **TypeScript**: Type-safe JavaScript
+- **Tailwind CSS**: Utility-first CSS framework
+- **shadcn/ui**: High-quality React components built on Radix UI
+- **Lucide Icons**: Beautiful icon library
 
 ## Database Schema
 
@@ -35,9 +46,14 @@ A comprehensive library management web application built with FastAPI, SQLAlchem
 
 ### Prerequisites
 
+**Backend:**
 - Python 3.9 or higher
-- Docker and Docker Compose (for PostgreSQL)
+- PostgreSQL database
 - Google Cloud Console account (for OAuth credentials)
+
+**Frontend:**
+- Node.js 18.x or higher
+- npm or yarn package manager
 
 ### Step 1: Clone the Repository
 
@@ -101,6 +117,7 @@ SECRET_KEY=your-secret-key-here-use-openssl-rand-hex-32
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 APP_URL=http://localhost:8000
+FRONTEND_URL=http://localhost:3000
 ```
 
 To generate a secure SECRET_KEY:
@@ -131,13 +148,50 @@ alembic revision --autogenerate -m "Initial migration"
 alembic upgrade head
 ```
 
-### Step 9: Run the Application
+### Step 9: Run the Backend Application
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 The API will be available at `http://localhost:8000`
+
+### Step 10: Set Up Frontend (Optional but Recommended)
+
+For detailed frontend setup instructions, see [FRONTEND_SETUP.md](FRONTEND_SETUP.md)
+
+**Quick Start:**
+
+```bash
+# Navigate to frontend directory
+cd frontend
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+```
+
+The frontend will be available at `http://localhost:3000`
+
+**Running Both Servers:**
+
+Open two terminal windows:
+
+**Terminal 1 (Backend):**
+```bash
+source venv/bin/activate
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Terminal 2 (Frontend):**
+```bash
+cd frontend
+npm run dev
+```
+
+Then visit `http://localhost:3000` to use the application.
 
 ## API Documentation
 
@@ -281,7 +335,7 @@ curl -X POST "http://localhost:8000/borrow/return/1" \
 
 ```
 manos_library/
-├── app/
+├── app/                     # Backend FastAPI application
 │   ├── __init__.py
 │   ├── main.py              # FastAPI application entry point
 │   ├── config.py            # Configuration management
@@ -301,15 +355,36 @@ manos_library/
 │   └── dependencies/
 │       ├── __init__.py
 │       └── auth.py          # Authentication dependencies
+├── frontend/                # Next.js frontend application
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── page.tsx           # Landing page
+│   │   │   ├── dashboard/
+│   │   │   │   └── page.tsx       # User dashboard
+│   │   │   ├── books/
+│   │   │   │   └── page.tsx       # Books listing
+│   │   │   ├── layout.tsx         # Root layout
+│   │   │   └── globals.css        # Global styles
+│   │   ├── components/
+│   │   │   └── ui/                # shadcn/ui components
+│   │   └── lib/
+│   │       ├── api.ts             # API client
+│   │       └── utils.ts           # Utilities
+│   ├── public/                    # Static assets
+│   ├── package.json               # Frontend dependencies
+│   ├── tsconfig.json              # TypeScript config
+│   ├── tailwind.config.ts         # Tailwind CSS config
+│   └── next.config.mjs            # Next.js config
 ├── alembic/
 │   ├── env.py               # Alembic environment configuration
 │   ├── script.py.mako       # Migration template
 │   └── versions/            # Migration files (auto-generated)
 ├── alembic.ini              # Alembic configuration
 ├── requirements.txt         # Python dependencies
-├── docker-compose.yml       # PostgreSQL setup
-├── .env.example            # Environment variables template
-└── README.md               # This file
+├── docker-compose.yml       # PostgreSQL setup (optional)
+├── .env.example             # Environment variables template
+├── README.md                # This file
+└── FRONTEND_SETUP.md        # Frontend setup guide
 ```
 
 ## Development
@@ -343,15 +418,25 @@ flake8 app/
 
 ## Future Enhancements
 
-- Add email notifications for due dates
+### Frontend
+- Add "My Borrowed Books" page to view current loans
+- Create librarian/admin management interface for book and inventory management
+- Add book detail modal/page with full information
+- Implement pagination for book listings
+- Add toast notifications for user actions
+- Create mobile-responsive navigation menu
+- Add user profile page
+
+### Backend
+- Add email notifications for due dates and reminders
 - Implement fine calculation for overdue books
-- Add book reservation system
-- Create admin dashboard UI
-- Add search and filtering capabilities
-- Implement pagination for list endpoints
-- Add book categories and tags
-- Create reporting and analytics features
-- Add multi-library support
+- Add book reservation system with waiting lists
+- Create reporting and analytics endpoints
+- Add advanced filtering (by genre, year, availability)
+- Implement rate limiting for API endpoints
+- Add book categories and tagging system
+- Support multi-library management
+- Add book cover image uploads
 
 ## Contributing
 

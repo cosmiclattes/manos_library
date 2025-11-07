@@ -62,7 +62,8 @@ def search_books(
 
     - **title**: Search term for book title (case-insensitive partial match)
     - **author**: Search term for author name (case-insensitive partial match)
-    - If both provided, returns books matching BOTH criteria
+    - If both provided with same value, returns books matching EITHER criteria (OR logic)
+    - If both provided with different values, returns books matching BOTH criteria (AND logic)
     - If only one provided, returns books matching that criterion
     - Returns empty list if no search terms provided
     """
@@ -82,10 +83,16 @@ def search_books(
     if author:
         filters.append(Book.author.ilike(f"%{author}%"))
 
-    # Apply filters with AND logic (both must match if both provided)
+    # Apply filters
+    # If both title and author are the same, use OR logic (unified search)
+    # Otherwise use AND logic (both must match if both provided)
     if len(filters) == 1:
         query = query.filter(filters[0])
+    elif title == author:
+        # Unified search - search for the term in either title or author
+        query = query.filter(or_(*filters))
     else:
+        # Different search terms - use AND logic
         query = query.filter(*filters)
 
     books = query.offset(skip).limit(limit).all()

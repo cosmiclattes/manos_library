@@ -13,13 +13,13 @@ Visit in your browser:
 http://localhost:8000/auth/login/google
 ```
 
-### Step 2: Automatic Cookie Setup
+### Step 2: Automatic Cookie Setup and Redirect
 
 After successful OAuth:
-1. You'll be redirected back to the app
-2. An HTTP-only cookie named `access_token` is automatically set
-3. The cookie contains: `Bearer <your_jwt_token>`
-4. Cookie expires in 30 minutes (configurable)
+1. An HTTP-only cookie named `access_token` is automatically set
+2. The cookie contains: `Bearer <your_jwt_token>`
+3. Cookie expires in 30 minutes (configurable)
+4. You'll be automatically redirected to the frontend dashboard at `http://localhost:3000/dashboard`
 
 ### Step 3: Access Protected Endpoints
 

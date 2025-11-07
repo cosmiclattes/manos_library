@@ -79,12 +79,8 @@ async def auth_callback_google(request: Request, db: Session = Depends(get_db)):
             data={"sub": user.email}, expires_delta=access_token_expires
         )
 
-        # Create response with cookie
-        response = JSONResponse(content={
-            "access_token": access_token,
-            "token_type": "bearer",
-            "message": "Authentication successful! Token saved in cookie."
-        })
+        # Redirect to frontend dashboard with cookie
+        response = RedirectResponse(url=f"{settings.FRONTEND_URL}/dashboard")
 
         # Set HTTP-only cookie with the token
         response.set_cookie(

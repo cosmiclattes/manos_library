@@ -24,7 +24,10 @@ app.add_middleware(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        settings.FRONTEND_URL,  # Next.js frontend (default: http://localhost:3000)
+        "http://localhost:3001",  # Alternative port
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
