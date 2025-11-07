@@ -1,0 +1,9 @@
+version: '3.8'
+
+# This file is for additional services (if needed in the future)
+# PostgreSQL is now configured to use an external database
+
+# If you want to use Docker PostgreSQL instead, use:
+# docker-compose -f docker-compose.postgres.yml up -d
+
+services: {}
