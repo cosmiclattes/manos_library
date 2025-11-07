@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
+from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session
 from authlib.integrations.starlette_client import OAuth
 from jose import jwt
@@ -79,7 +79,25 @@ async def auth_callback_google(request: Request, db: Session = Depends(get_db)):
             data={"sub": user.email}, expires_delta=access_token_expires
         )
 
-        return {"access_token": access_token, "token_type": "bearer"}
+        # Create response with cookie
+        response = JSONResponse(content={
+            "access_token": access_token,
+            "token_type": "bearer",
+            "message": "Authentication successful! Token saved in cookie."
+        })
+
+        # Set HTTP-only cookie with the token
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {access_token}",
+            httponly=True,
+            max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+            expires=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+            samesite="lax",
+            secure=False  # Set to True in production with HTTPS
+        )
+
+        return response
 
     except Exception as e:
         raise HTTPException(
@@ -94,3 +112,10 @@ async def get_current_user_info(
     current_user: User = Depends(get_current_user)
 ):
     return current_user
+
+
+@router.post("/logout")
+async def logout(response: Response):
+    """Logout by clearing the access token cookie"""
+    response.delete_cookie(key="access_token")
+    return {"message": "Successfully logged out"}
