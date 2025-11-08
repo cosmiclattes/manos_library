@@ -2,10 +2,11 @@
 
 // In production (static build served by FastAPI), use same origin (empty string)
 // In development, use localhost:8000
-const API_URL = process.env.NEXT_PUBLIC_API_URL ||
-  (typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    ? 'http://localhost:8000'
-    : '');
+const API_URL = process.env.NEXT_PUBLIC_API_URL !== undefined
+  ? process.env.NEXT_PUBLIC_API_URL
+  : (typeof window !== 'undefined' && window.location.hostname === 'localhost'
+      ? 'http://localhost:8000'
+      : '');
 
 export interface Book {
   id: number;
