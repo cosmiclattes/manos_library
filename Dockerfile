@@ -13,6 +13,9 @@ RUN npm ci
 # Copy frontend source
 COPY frontend/ ./
 
+# Set environment variable for production build (empty string = same origin)
+ENV NEXT_PUBLIC_API_URL=""
+
 # Build Next.js static export
 RUN npm run build
 
@@ -36,6 +39,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app/ ./app/
 COPY alembic/ ./alembic/
 COPY alembic.ini ./
+COPY start.sh ./
+
+# Make start script executable
+RUN chmod +x start.sh
 
 # Copy built frontend from previous stage
 COPY --from=frontend-builder /frontend/out ./frontend/out
@@ -44,4 +51,4 @@ COPY --from=frontend-builder /frontend/out ./frontend/out
 EXPOSE 8000
 
 # Run migrations and start server
-CMD ["sh", "-c", "echo '========================================' && echo 'Starting Library Management System' && echo \"PORT: ${PORT:-8000}\" && echo '========================================' && echo 'Running database migrations...' && alembic upgrade head && echo '✅ Migrations complete' && echo \"Starting hypercorn server on 0.0.0.0:${PORT:-8000}...\" && hypercorn app.main:app --bind 0.0.0.0:${PORT:-8000} --access-log - --error-log -"]
+CMD ["./start.sh"]
