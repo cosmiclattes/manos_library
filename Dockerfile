@@ -44,14 +44,13 @@ COPY --from=frontend-builder /frontend/out ./frontend/out
 EXPOSE 8000
 
 # Run migrations and start server
-CMD set -x && \
-    echo "========================================" && \
+CMD echo "========================================" && \
     echo "Starting Library Management System" && \
     echo "PORT: ${PORT:-8000}" && \
     echo "DATABASE_URL is set: $(if [ -n "$DATABASE_URL" ]; then echo 'YES'; else echo 'NO'; fi)" && \
     echo "========================================" && \
     echo "Running database migrations..." && \
-    alembic upgrade head -v || (echo "Migration failed but continuing..." && exit 1) && \
+    alembic upgrade head -v || (echo "❌ Migration failed!" && exit 1) && \
     echo "✅ Migrations complete" && \
     echo "Starting hypercorn server on 0.0.0.0:${PORT:-8000}..." && \
     hypercorn app.main:app --bind 0.0.0.0:${PORT:-8000} --access-log - --error-log -

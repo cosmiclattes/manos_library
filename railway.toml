@@ -3,7 +3,7 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "set -x && echo 'Starting server...' && echo 'DATABASE_URL set:' $(if [ -n \"$DATABASE_URL\" ]; then echo 'YES'; else echo 'NO'; fi) && echo 'Running migrations...' && alembic upgrade head -v && echo 'Migrations complete!' && echo 'Starting hypercorn...' && hypercorn app.main:app --bind 0.0.0.0:$PORT --access-log - --error-log -"
+startCommand = "echo 'Starting server...' && echo 'DATABASE_URL set:' $(if [ -n \"$DATABASE_URL\" ]; then echo 'YES'; else echo 'NO'; fi) && echo 'Running migrations...' && alembic upgrade head -v && echo 'Migrations complete!' && echo 'Starting hypercorn...' && hypercorn app.main:app --bind 0.0.0.0:$PORT --access-log - --error-log -"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
