@@ -5,14 +5,36 @@ from fastapi.responses import FileResponse
 from starlette.middleware.sessions import SessionMiddleware
 from pathlib import Path
 import os
+import logging
 from app.api import auth, books, inventory, borrow
 from app.database import engine
 from app.models import models
 from app.config import get_settings
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+logger.info("=" * 60)
+logger.info("Starting Library Management System")
+logger.info("=" * 60)
+
 settings = get_settings()
 
+# Log environment configuration (without sensitive data)
+logger.info(f"Environment: {settings.ENVIRONMENT}")
+logger.info(f"Debug mode: {settings.DEBUG}")
+logger.info(f"App URL: {settings.APP_URL}")
+logger.info(f"Frontend URL: {settings.FRONTEND_URL}")
+logger.info(f"Database URL: {settings.DATABASE_URL[:30]}...")
+logger.info(f"Google Client ID: {settings.GOOGLE_CLIENT_ID[:20]}...")
+logger.info(f"Port from env: {os.getenv('PORT', '8000')}")
+
 models.Base.metadata.create_all(bind=engine)
+logger.info("Database tables created/verified")
 
 app = FastAPI(
     title="Library Management System",
@@ -50,10 +72,30 @@ app.include_router(books.router)
 app.include_router(inventory.router)
 app.include_router(borrow.router)
 
+logger.info("All routers registered")
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Log when the application starts"""
+    logger.info("=" * 60)
+    logger.info("✅ APPLICATION STARTUP COMPLETE")
+    logger.info(f"✅ Server is ready to accept connections")
+    logger.info(f"✅ Health check endpoint: /api/health")
+    logger.info(f"✅ API docs endpoint: /docs")
+    logger.info("=" * 60)
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Log when the application shuts down"""
+    logger.info("Application shutting down")
+
 
 @app.get("/api")
 def read_root():
     """API root endpoint"""
+    logger.info("API root endpoint called")
     return {
         "message": "Welcome to Library Management System API",
         "docs": "/docs",
@@ -64,6 +106,7 @@ def read_root():
 @app.get("/api/health")
 def health_check():
     """Health check endpoint"""
+    logger.info("Health check endpoint called - returning healthy status")
     return {"status": "healthy"}
 
 
@@ -86,9 +129,14 @@ def debug_oauth_config():
 # This should be added AFTER all API routes
 static_dir = Path(__file__).parent.parent / "frontend" / "out"
 
+logger.info(f"Checking for frontend build at: {static_dir}")
+logger.info(f"Frontend directory exists: {static_dir.exists()}")
+
 if static_dir.exists():
+    logger.info("Frontend build found - mounting static files")
     # Mount static files (JS, CSS, images, etc.)
     app.mount("/_next", StaticFiles(directory=static_dir / "_next"), name="next-static")
+    logger.info("Static files mounted at /_next")
 
     # Serve other static assets
     @app.get("/{full_path:path}")
@@ -113,6 +161,7 @@ if static_dir.exists():
         # Fallback
         return {"error": "Frontend not built. Run: cd frontend && npm run build"}
 else:
+    logger.warning("Frontend build not found - serving API only")
     @app.get("/")
     async def frontend_not_built():
         """Fallback when frontend is not built"""
@@ -121,3 +170,8 @@ else:
             "api_docs": "/docs",
             "build_frontend": "cd frontend && npm run build"
         }
+
+logger.info("=" * 60)
+logger.info("Application module loaded successfully")
+logger.info("Waiting for server to start...")
+logger.info("=" * 60)
