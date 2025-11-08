@@ -1,0 +1,48 @@
+# Multi-stage build for Library Management System
+# Stage 1: Build Frontend (Next.js)
+FROM node:18-alpine AS frontend-builder
+
+WORKDIR /frontend
+
+# Copy frontend package files
+COPY frontend/package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy frontend source
+COPY frontend/ ./
+
+# Build Next.js static export
+RUN npm run build
+
+# Stage 2: Build Backend (Python/FastAPI)
+FROM python:3.11-slim AS backend
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Python requirements
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY app/ ./app/
+COPY alembic/ ./alembic/
+COPY alembic.ini ./
+
+# Copy built frontend from previous stage
+COPY --from=frontend-builder /frontend/out ./frontend/out
+
+# Expose port
+EXPOSE 8000
+
+# Run migrations and start server
+CMD alembic upgrade head && \
+    uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}

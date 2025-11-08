@@ -418,30 +418,54 @@ flake8 app/
 
 ## Deployment
 
-For detailed deployment instructions, including production environment setup, database configuration, and hosting options, see the **[DEPLOYMENT.md](DEPLOYMENT.md)** guide.
+This project is configured for **monolithic deployment** - frontend and backend run in a single Docker container, making deployment simple and cost-effective.
 
-### Quick Deploy Summary
+### 🚀 Quick Deploy to Railway (Recommended)
 
-1. **Set up production environment**:
-   ```bash
-   cp .env.prod.example .env.prod
-   # Edit .env.prod with your production values
-   ```
+**One-click deployment with Railway.app:**
 
-2. **Configure production database** (PostgreSQL)
+1. **Push to GitHub**
+2. **Connect Railway to your repo**
+3. **Add PostgreSQL database**
+4. **Set environment variables**
+5. **Deploy automatically**
 
-3. **Set up Google OAuth** for production domain
+See **[RAILWAY_DEPLOYMENT.md](RAILWAY_DEPLOYMENT.md)** for complete Railway deployment guide.
 
-4. **Deploy backend** (Docker, Heroku, Railway, Render, or VPS)
+### 🐳 Docker Deployment
 
-5. **Deploy frontend** (Vercel, Netlify, or self-hosted)
+The included `Dockerfile` builds both frontend (Next.js static) and backend (FastAPI) in a single container:
 
-6. **Run database migrations**:
-   ```bash
-   ENV_FILE=.env.prod alembic upgrade head
-   ```
+```bash
+# Build locally
+docker build -t library-management .
 
-For complete step-by-step instructions, cloud provider guides, security considerations, and troubleshooting, see **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+# Run locally
+docker run -p 8000:8000 --env-file .env.prod library-management
+
+# Visit http://localhost:8000
+```
+
+### 📋 Other Deployment Options
+
+For other platforms (Heroku, Render, VPS, etc.), see **[DEPLOYMENT.md](DEPLOYMENT.md)** for:
+- Separate frontend/backend deployment
+- Cloud provider specific guides
+- Production environment configuration
+- Security best practices
+- Troubleshooting
+
+### Architecture
+
+**Development** (2 servers):
+- Frontend: `npm run dev` on port 3000
+- Backend: `uvicorn app.main:app` on port 8000
+
+**Production** (1 server):
+- FastAPI serves both API routes and static frontend
+- Next.js built as static files
+- Single Docker container
+- Everything on the same domain (no CORS issues)
 
 ## Future Enhancements
 

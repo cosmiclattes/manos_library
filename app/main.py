@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from starlette.middleware.sessions import SessionMiddleware
+from pathlib import Path
+import os
 from app.api import auth, books, inventory, borrow
 from app.database import engine
 from app.models import models
@@ -47,8 +51,9 @@ app.include_router(inventory.router)
 app.include_router(borrow.router)
 
 
-@app.get("/")
+@app.get("/api")
 def read_root():
+    """API root endpoint"""
     return {
         "message": "Welcome to Library Management System API",
         "docs": "/docs",
@@ -56,8 +61,9 @@ def read_root():
     }
 
 
-@app.get("/health")
+@app.get("/api/health")
 def health_check():
+    """Health check endpoint"""
     return {"status": "healthy"}
 
 
@@ -74,3 +80,44 @@ def debug_oauth_config():
         "environment": settings.ENVIRONMENT,
         "note": "Copy the redirect_uri above and add it EXACTLY to Google Cloud Console"
     }
+
+
+# Serve static frontend files (Next.js build output)
+# This should be added AFTER all API routes
+static_dir = Path(__file__).parent.parent / "frontend" / "out"
+
+if static_dir.exists():
+    # Mount static files (JS, CSS, images, etc.)
+    app.mount("/_next", StaticFiles(directory=static_dir / "_next"), name="next-static")
+
+    # Serve other static assets
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        """Serve the Next.js frontend for all non-API routes"""
+
+        # Try to serve the exact file if it exists
+        file_path = static_dir / full_path
+        if file_path.is_file():
+            return FileResponse(file_path)
+
+        # Try with .html extension
+        html_path = static_dir / f"{full_path}.html"
+        if html_path.is_file():
+            return FileResponse(html_path)
+
+        # For client-side routing, serve index.html
+        index_path = static_dir / "index.html"
+        if index_path.is_file():
+            return FileResponse(index_path)
+
+        # Fallback
+        return {"error": "Frontend not built. Run: cd frontend && npm run build"}
+else:
+    @app.get("/")
+    async def frontend_not_built():
+        """Fallback when frontend is not built"""
+        return {
+            "message": "API is running, but frontend is not built",
+            "api_docs": "/docs",
+            "build_frontend": "cd frontend && npm run build"
+        }
