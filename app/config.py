@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from functools import lru_cache
+import os
 
 
 class Settings(BaseSettings):
@@ -11,9 +12,15 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     APP_URL: str = "http://localhost:8000"
     FRONTEND_URL: str = "http://localhost:3000"
+    ENVIRONMENT: str = "development"
+    DEBUG: bool = True
 
     class Config:
-        env_file = ".env"
+        # Support multiple environment files
+        # Priority: .env.prod > .env.production > .env.staging > .env
+        env_file = os.getenv("ENV_FILE", ".env")
+        env_file_encoding = "utf-8"
+        case_sensitive = False
 
 
 @lru_cache()

@@ -416,6 +416,33 @@ flake8 app/
 - Implement rate limiting for production use
 - Add input validation and sanitization
 
+## Deployment
+
+For detailed deployment instructions, including production environment setup, database configuration, and hosting options, see the **[DEPLOYMENT.md](DEPLOYMENT.md)** guide.
+
+### Quick Deploy Summary
+
+1. **Set up production environment**:
+   ```bash
+   cp .env.prod.example .env.prod
+   # Edit .env.prod with your production values
+   ```
+
+2. **Configure production database** (PostgreSQL)
+
+3. **Set up Google OAuth** for production domain
+
+4. **Deploy backend** (Docker, Heroku, Railway, Render, or VPS)
+
+5. **Deploy frontend** (Vercel, Netlify, or self-hosted)
+
+6. **Run database migrations**:
+   ```bash
+   ENV_FILE=.env.prod alembic upgrade head
+   ```
+
+For complete step-by-step instructions, cloud provider guides, security considerations, and troubleshooting, see **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+
 ## Future Enhancements
 
 ### Frontend

@@ -22,12 +22,20 @@ app.add_middleware(
     secret_key=settings.SECRET_KEY
 )
 
+# Configure CORS based on environment
+allowed_origins = [settings.FRONTEND_URL]
+
+# Add localhost variations in development
+if settings.ENVIRONMENT == "development" or settings.DEBUG:
+    allowed_origins.extend([
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+    ])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        settings.FRONTEND_URL,  # Next.js frontend (default: http://localhost:3000)
-        "http://localhost:3001",  # Alternative port
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -55,10 +63,14 @@ def health_check():
 
 @app.get("/debug/oauth-config")
 def debug_oauth_config():
-    """Debug endpoint to check OAuth configuration"""
+    """Debug endpoint to check OAuth configuration (development only)"""
+    if settings.ENVIRONMENT == "production" and not settings.DEBUG:
+        return {"error": "Debug endpoints disabled in production"}
+
     return {
         "app_url": settings.APP_URL,
         "redirect_uri": f"{settings.APP_URL}/auth/callback/google",
         "google_client_id": settings.GOOGLE_CLIENT_ID[:20] + "..." if len(settings.GOOGLE_CLIENT_ID) > 20 else settings.GOOGLE_CLIENT_ID,
+        "environment": settings.ENVIRONMENT,
         "note": "Copy the redirect_uri above and add it EXACTLY to Google Cloud Console"
     }
