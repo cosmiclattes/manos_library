@@ -17,8 +17,26 @@ from app.config import get_settings
 config = context.config
 
 # Get database URL from settings
-settings = get_settings()
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+try:
+    print("=" * 60)
+    print("Alembic: Loading settings...")
+    settings = get_settings()
+    print(f"Alembic: DATABASE_URL loaded: {settings.DATABASE_URL[:30]}...")
+    print(f"Alembic: Setting up migrations...")
+    config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+    print("Alembic: Configuration complete")
+    print("=" * 60)
+except Exception as e:
+    print("=" * 60)
+    print("❌ ALEMBIC CONFIGURATION FAILED")
+    print(f"❌ Error: {e}")
+    print("❌ This usually means required environment variables are missing:")
+    print("   - DATABASE_URL")
+    print("   - GOOGLE_CLIENT_ID")
+    print("   - GOOGLE_CLIENT_SECRET")
+    print("   - SECRET_KEY")
+    print("=" * 60)
+    raise
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
