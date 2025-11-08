@@ -2,11 +2,29 @@
 
 // In production (static build served by FastAPI), use same origin (empty string)
 // In development, use localhost:8000
-const API_URL = process.env.NEXT_PUBLIC_API_URL !== undefined
-  ? process.env.NEXT_PUBLIC_API_URL
-  : (typeof window !== 'undefined' && window.location.hostname === 'localhost'
-      ? 'http://localhost:8000'
-      : '');
+const getApiUrl = () => {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL;
+
+  // If set to special value "SAME_ORIGIN", use empty string for same-origin requests
+  if (envUrl === 'SAME_ORIGIN') {
+    return '';
+  }
+
+  // If explicitly set, use it
+  if (envUrl) {
+    return envUrl;
+  }
+
+  // Development fallback: use localhost if running on localhost
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return 'http://localhost:8000';
+  }
+
+  // Default: same-origin requests
+  return '';
+};
+
+const API_URL = getApiUrl();
 
 export interface Book {
   id: number;

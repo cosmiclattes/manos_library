@@ -13,8 +13,9 @@ RUN npm ci
 # Copy frontend source
 COPY frontend/ ./
 
-# Set environment variable for production build (empty string = same origin)
-ENV NEXT_PUBLIC_API_URL=""
+# Set environment variable for production build
+# Using special value to indicate same-origin requests
+ENV NEXT_PUBLIC_API_URL="SAME_ORIGIN"
 
 # Build Next.js static export
 RUN npm run build
