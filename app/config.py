@@ -15,6 +15,11 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
 
+    # Google Cloud / Vertex AI settings
+    GOOGLE_CLOUD_PROJECT: str = ""
+    GOOGLE_CLOUD_LOCATION: str = "us-central1"
+    GOOGLE_APPLICATION_CREDENTIALS: str = ""
+
     class Config:
         # Support multiple environment files
         # Priority: .env.prod > .env.production > .env.staging > .env
