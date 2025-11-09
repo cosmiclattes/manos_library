@@ -31,13 +31,12 @@ export default function ProfilePage() {
     }
   };
 
-  const loadAccessToken = () => {
-    // Get access token from cookies
-    const cookies = document.cookie.split(';');
-    const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
-    if (tokenCookie) {
-      const token = tokenCookie.split('=')[1];
-      setAccessToken(token);
+  const loadAccessToken = async () => {
+    try {
+      const tokenData = await api.auth.getAccessToken();
+      setAccessToken(tokenData.access_token);
+    } catch (err) {
+      console.error('Failed to load access token:', err);
     }
   };
 

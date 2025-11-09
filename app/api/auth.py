@@ -110,6 +110,25 @@ async def get_current_user_info(
     return current_user
 
 
+@router.get("/token")
+async def get_access_token(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get a fresh access token for the current user.
+    Useful for API scripts and integrations.
+    """
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": current_user.email}, expires_delta=access_token_expires
+    )
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    }
+
+
 @router.post("/logout")
 async def logout(response: Response):
     """Logout by clearing the access token cookie"""

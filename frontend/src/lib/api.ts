@@ -108,12 +108,7 @@ class APIClient {
   // Auth endpoints
   auth = {
     loginWithGoogle: () => {
-      console.log('=== loginWithGoogle called ===');
-      console.log('this.baseURL:', this.baseURL);
-      debugger;
       const redirectUrl = `${this.baseURL}/auth/login/google`;
-      console.log('Redirecting to:', redirectUrl);
-      console.log('==============================');
       window.location.href = redirectUrl;
     },
 
@@ -122,6 +117,8 @@ class APIClient {
     }),
 
     getCurrentUser: () => this.request<User>('/auth/me'),
+
+    getAccessToken: () => this.request<{ access_token: string; token_type: string; expires_in: number }>('/auth/token'),
   };
 
   // Books endpoints
