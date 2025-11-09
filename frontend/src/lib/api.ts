@@ -108,7 +108,12 @@ class APIClient {
   // Auth endpoints
   auth = {
     loginWithGoogle: () => {
-      window.location.href = `${this.baseURL}/auth/login/google`;
+      console.log('=== loginWithGoogle called ===');
+      console.log('this.baseURL:', this.baseURL);
+      const redirectUrl = `${this.baseURL}/auth/login/google`;
+      console.log('Redirecting to:', redirectUrl);
+      console.log('==============================');
+      window.location.href = redirectUrl;
     },
 
     logout: () => this.request<{ message: string }>('/auth/logout', {
