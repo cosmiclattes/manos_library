@@ -7,9 +7,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, BookOpen, Library, ArrowLeft } from 'lucide-react';
+import { Search, BookOpen, Library, ArrowLeft, Loader2 } from 'lucide-react';
 import TopBar from '@/components/TopBar';
 import { Pagination } from '@/components/ui/pagination';
+import { useToast } from '@/hooks/useToast';
+import { Toast } from '@/components/ui/toast';
 
 type View = 'all-books' | 'borrowed-books';
 
@@ -29,6 +31,13 @@ export default function MemberDashboardPage() {
   const [currentView, setCurrentView] = useState<View>('all-books');
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  // Toast notifications
+  const { toasts, showToast, hideToast } = useToast();
+
+  // Button loading states
+  const [borrowingBookId, setBorrowingBookId] = useState<number | null>(null);
+  const [returningBookId, setReturningBookId] = useState<number | null>(null);
 
   // Pagination state
   const [allBooksPage, setAllBooksPage] = useState(1);
@@ -120,21 +129,27 @@ export default function MemberDashboardPage() {
 
   const handleBorrow = async (bookId: number) => {
     try {
+      setBorrowingBookId(bookId);
       await api.borrow.borrowBook(bookId);
-      alert('Book borrowed successfully!');
+      showToast('Book borrowed successfully!', 'success');
       loadBooks();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to borrow book');
+      showToast(err instanceof Error ? err.message : 'Failed to borrow book', 'error');
+    } finally {
+      setBorrowingBookId(null);
     }
   };
 
   const handleReturn = async (bookId: number) => {
     try {
+      setReturningBookId(bookId);
       await api.borrow.returnBook(bookId);
-      alert('Book returned successfully!');
+      showToast('Book returned successfully!', 'success');
       loadBorrowedBooks();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to return book');
+      showToast(err instanceof Error ? err.message : 'Failed to return book', 'error');
+    } finally {
+      setReturningBookId(null);
     }
   };
 
@@ -171,6 +186,16 @@ export default function MemberDashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Toast Notifications */}
+      {toasts.map((toast) => (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => hideToast(toast.id)}
+        />
+      ))}
+
       <TopBar user={user} />
       <div className="flex">
       {/* Sidebar */}
@@ -334,11 +359,20 @@ export default function MemberDashboardPage() {
                               <Button
                                 onClick={() => handleBorrow(book.id)}
                                 disabled={
+                                  borrowingBookId === book.id ||
                                   !book.available_copies ||
                                   book.available_copies <= 0
                                 }
+                                className="transition-all hover:scale-105 active:scale-95"
                               >
-                                Borrow
+                                {borrowingBookId === book.id ? (
+                                  <>
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                    Borrowing...
+                                  </>
+                                ) : (
+                                  'Borrow'
+                                )}
                               </Button>
                             )}
                           </div>
@@ -438,8 +472,17 @@ export default function MemberDashboardPage() {
                             <Button
                               variant="outline"
                               onClick={() => handleReturn(record.book_id)}
+                              disabled={returningBookId === record.book_id}
+                              className="transition-all hover:scale-105 active:scale-95"
                             >
-                              Return Book
+                              {returningBookId === record.book_id ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  Returning...
+                                </>
+                              ) : (
+                                'Return Book'
+                              )}
                             </Button>
                           </div>
                         </div>

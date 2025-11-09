@@ -17,10 +17,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Search, BookOpen, Library, ArrowLeft, Plus, Edit, Package, Users, BookMarked } from 'lucide-react';
+import { Search, BookOpen, Library, ArrowLeft, Plus, Edit, Package, Users, BookMarked, Loader2 } from 'lucide-react';
 import TopBar from '@/components/TopBar';
 import { Pagination } from '@/components/ui/pagination';
 import StatCard from '@/components/StatCard';
+import { useToast } from '@/hooks/useToast';
+import { Toast } from '@/components/ui/toast';
 
 type View = 'all-books' | 'add-book' | 'users';
 
@@ -55,6 +57,15 @@ export default function LibrarianDashboardPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);
   const [userSearchQuery, setUserSearchQuery] = useState('');
+
+  // Toast notifications
+  const { toasts, showToast, hideToast } = useToast();
+
+  // Button loading states
+  const [changingRoleUserId, setChangingRoleUserId] = useState<number | null>(null);
+  const [addingBook, setAddingBook] = useState(false);
+  const [editingBook, setEditingBook] = useState(false);
+  const [editingInventory, setEditingInventory] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -150,12 +161,15 @@ export default function LibrarianDashboardPage() {
 
   const handleUserRoleChange = async (userId: number, newRole: 'member' | 'librarian') => {
     try {
+      setChangingRoleUserId(userId);
       await api.users.updateRole(userId, newRole);
-      alert('User role updated successfully!');
+      showToast('User role updated successfully!', 'success');
       loadUsers(); // Refresh the list
       loadStats(); // Refresh stats
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to update user role');
+      showToast(err instanceof Error ? err.message : 'Failed to update user role', 'error');
+    } finally {
+      setChangingRoleUserId(null);
     }
   };
 
@@ -199,14 +213,17 @@ export default function LibrarianDashboardPage() {
 
   const handleAddBook = async () => {
     try {
+      setAddingBook(true);
       await api.books.create(bookFormData);
-      alert('Book added successfully!');
+      showToast('Book added successfully!', 'success');
       setAddBookDialogOpen(false);
       resetBookForm();
       loadBooks();
       loadStats(); // Refresh stats
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to add book');
+      showToast(err instanceof Error ? err.message : 'Failed to add book', 'error');
+    } finally {
+      setAddingBook(false);
     }
   };
 
@@ -214,13 +231,16 @@ export default function LibrarianDashboardPage() {
     if (!selectedBook) return;
 
     try {
+      setEditingBook(true);
       await api.books.update(selectedBook.id, bookFormData);
-      alert('Book updated successfully!');
+      showToast('Book updated successfully!', 'success');
       setEditBookDialogOpen(false);
       resetBookForm();
       loadBooks();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to update book');
+      showToast(err instanceof Error ? err.message : 'Failed to update book', 'error');
+    } finally {
+      setEditingBook(false);
     }
   };
 
@@ -228,6 +248,7 @@ export default function LibrarianDashboardPage() {
     if (!selectedBook) return;
 
     try {
+      setEditingInventory(true);
       // Check if inventory exists
       if (selectedBook.inventory) {
         await api.inventory.update(selectedBook.id, inventoryFormData);
@@ -237,13 +258,15 @@ export default function LibrarianDashboardPage() {
           ...inventoryFormData,
         });
       }
-      alert('Inventory updated successfully!');
+      showToast('Inventory updated successfully!', 'success');
       setEditInventoryDialogOpen(false);
       resetInventoryForm();
       loadBooks();
       loadStats(); // Refresh stats
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to update inventory');
+      showToast(err instanceof Error ? err.message : 'Failed to update inventory', 'error');
+    } finally {
+      setEditingInventory(false);
     }
   };
 
@@ -323,6 +346,16 @@ export default function LibrarianDashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Toast Notifications */}
+      {toasts.map((toast) => (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => hideToast(toast.id)}
+        />
+      ))}
+
       <TopBar user={user} />
       <div className="flex">
       {/* Sidebar */}
@@ -458,17 +491,33 @@ export default function LibrarianDashboardPage() {
                                     variant={userItem.user_type === 'member' ? 'default' : 'outline'}
                                     size="sm"
                                     onClick={() => handleUserRoleChange(userItem.id, 'member')}
-                                    disabled={userItem.user_type === 'member'}
+                                    disabled={changingRoleUserId === userItem.id || userItem.user_type === 'member'}
+                                    className="transition-all hover:scale-105 active:scale-95"
                                   >
-                                    Member
+                                    {changingRoleUserId === userItem.id ? (
+                                      <>
+                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        Updating...
+                                      </>
+                                    ) : (
+                                      'Member'
+                                    )}
                                   </Button>
                                   <Button
                                     variant={userItem.user_type === 'librarian' ? 'default' : 'outline'}
                                     size="sm"
                                     onClick={() => handleUserRoleChange(userItem.id, 'librarian')}
-                                    disabled={userItem.user_type === 'librarian'}
+                                    disabled={changingRoleUserId === userItem.id || userItem.user_type === 'librarian'}
+                                    className="transition-all hover:scale-105 active:scale-95"
                                   >
-                                    Librarian
+                                    {changingRoleUserId === userItem.id ? (
+                                      <>
+                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        Updating...
+                                      </>
+                                    ) : (
+                                      'Librarian'
+                                    )}
                                   </Button>
                                 </div>
                               )}
@@ -638,6 +687,7 @@ export default function LibrarianDashboardPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => openEditBookDialog(book)}
+                          className="transition-all hover:scale-105 active:scale-95"
                         >
                           <Edit className="h-4 w-4 mr-1" />
                           Edit Book
@@ -646,6 +696,7 @@ export default function LibrarianDashboardPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => openEditInventoryDialog(book)}
+                          className="transition-all hover:scale-105 active:scale-95"
                         >
                           <Package className="h-4 w-4 mr-1" />
                           Edit Inventory
@@ -761,14 +812,23 @@ export default function LibrarianDashboardPage() {
                 setAddBookDialogOpen(false);
                 resetBookForm();
               }}
+              disabled={addingBook}
             >
               Cancel
             </Button>
             <Button
               onClick={handleAddBook}
-              disabled={!bookFormData.title || !bookFormData.author}
+              disabled={!bookFormData.title || !bookFormData.author || addingBook}
+              className="transition-all hover:scale-105 active:scale-95"
             >
-              Add Book
+              {addingBook ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Adding...
+                </>
+              ) : (
+                'Add Book'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -863,14 +923,23 @@ export default function LibrarianDashboardPage() {
                 setEditBookDialogOpen(false);
                 resetBookForm();
               }}
+              disabled={editingBook}
             >
               Cancel
             </Button>
             <Button
               onClick={handleEditBook}
-              disabled={!bookFormData.title || !bookFormData.author}
+              disabled={!bookFormData.title || !bookFormData.author || editingBook}
+              className="transition-all hover:scale-105 active:scale-95"
             >
-              Update Book
+              {editingBook ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                'Update Book'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -929,14 +998,26 @@ export default function LibrarianDashboardPage() {
                 setEditInventoryDialogOpen(false);
                 resetInventoryForm();
               }}
+              disabled={editingInventory}
             >
               Cancel
             </Button>
             <Button
               onClick={handleEditInventory}
-              disabled={inventoryFormData.borrowed_copies > inventoryFormData.total_copies}
+              disabled={
+                inventoryFormData.borrowed_copies > inventoryFormData.total_copies ||
+                editingInventory
+              }
+              className="transition-all hover:scale-105 active:scale-95"
             >
-              Update Inventory
+              {editingInventory ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                'Update Inventory'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -15,8 +15,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Search, BookOpen, LogOut, Home } from 'lucide-react';
+import { Search, BookOpen, LogOut, Home, Loader2 } from 'lucide-react';
 import { Pagination } from '@/components/ui/pagination';
+import { useToast } from '@/hooks/useToast';
+import { Toast } from '@/components/ui/toast';
 
 export default function BooksPage() {
   const router = useRouter();
@@ -25,6 +27,12 @@ export default function BooksPage() {
   const [searchTitle, setSearchTitle] = useState('');
   const [searchAuthor, setSearchAuthor] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  // Toast notifications
+  const { toasts, showToast, hideToast } = useToast();
+
+  // Button loading states
+  const [borrowingBookId, setBorrowingBookId] = useState<number | null>(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -72,11 +80,14 @@ export default function BooksPage() {
 
   const handleBorrow = async (bookId: number) => {
     try {
+      setBorrowingBookId(bookId);
       await api.borrow.borrowBook(bookId);
-      alert('Book borrowed successfully!');
+      showToast('Book borrowed successfully!', 'success');
       loadBooks(); // Refresh the list
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to borrow book');
+      showToast(err instanceof Error ? err.message : 'Failed to borrow book', 'error');
+    } finally {
+      setBorrowingBookId(null);
     }
   };
 
@@ -102,6 +113,16 @@ export default function BooksPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Toast Notifications */}
+      {toasts.map((toast) => (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => hideToast(toast.id)}
+        />
+      ))}
+
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -227,9 +248,21 @@ export default function BooksPage() {
                           <Button
                             size="sm"
                             onClick={() => handleBorrow(book.id)}
-                            disabled={!book.available_copies || book.available_copies <= 0}
+                            disabled={
+                              borrowingBookId === book.id ||
+                              !book.available_copies ||
+                              book.available_copies <= 0
+                            }
+                            className="transition-all hover:scale-105 active:scale-95"
                           >
-                            Borrow
+                            {borrowingBookId === book.id ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Borrowing...
+                              </>
+                            ) : (
+                              'Borrow'
+                            )}
                           </Button>
                         )}
                       </TableCell>
