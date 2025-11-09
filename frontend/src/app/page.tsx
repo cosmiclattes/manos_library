@@ -39,7 +39,7 @@ export default function HomePage() {
             Manos Library
           </h1>
           <p className="text-xl text-gray-600 mb-12">
-            Manage your books, track inventory, and streamline borrowing
+            Read, Learn, Grow
           </p>
           <Button
             onClick={handleLogin}
