@@ -33,6 +33,7 @@ interface BookFormData {
   summary?: string;
   genre?: string;
   year_of_publishing?: number;
+  in_circulation: boolean;
 }
 
 interface InventoryFormData {
@@ -86,6 +87,7 @@ export default function LibrarianDashboardPage() {
     summary: '',
     genre: '',
     year_of_publishing: undefined,
+    in_circulation: true,
   });
 
   const [inventoryFormData, setInventoryFormData] = useState<InventoryFormData>({
@@ -294,6 +296,7 @@ export default function LibrarianDashboardPage() {
       summary: book.summary || '',
       genre: book.genre || '',
       year_of_publishing: book.year_of_publishing,
+      in_circulation: book.in_circulation,
     });
     setEditBookDialogOpen(true);
   };
@@ -315,6 +318,7 @@ export default function LibrarianDashboardPage() {
       summary: '',
       genre: '',
       year_of_publishing: undefined,
+      in_circulation: true,
     });
     setSelectedBook(null);
   };
