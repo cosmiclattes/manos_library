@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { api, type User } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Users, Library, LogOut, Search } from 'lucide-react';
+import { BookOpen, Users, Library, Search } from 'lucide-react';
+import TopBar from '@/components/TopBar';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -40,15 +41,6 @@ export default function DashboardPage() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await api.auth.logout();
-      router.push('/');
-    } catch (err) {
-      console.error('Logout failed:', err);
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -59,18 +51,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Library className="h-6 w-6 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          </div>
-          <Button variant="outline" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
-          </Button>
-        </div>
-      </header>
+      <TopBar user={user} />
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">

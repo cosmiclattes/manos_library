@@ -17,7 +17,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Search, BookOpen, LogOut, Library, ArrowLeft, Plus, Edit, Package } from 'lucide-react';
+import { Search, BookOpen, Library, ArrowLeft, Plus, Edit, Package } from 'lucide-react';
+import TopBar from '@/components/TopBar';
 
 type View = 'all-books' | 'add-book';
 
@@ -211,15 +212,6 @@ export default function LibrarianDashboardPage() {
     setSelectedBook(null);
   };
 
-  const handleLogout = async () => {
-    try {
-      await api.auth.logout();
-      router.push('/');
-    } catch (err) {
-      console.error('Logout failed:', err);
-    }
-  };
-
   const handleViewChange = (view: View) => {
     setCurrentView(view);
     if (view === 'add-book') {
@@ -229,7 +221,9 @@ export default function LibrarianDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50">
+      <TopBar user={user} />
+      <div className="flex">
       {/* Sidebar */}
       <aside className="w-64 bg-white shadow-md border-r flex flex-col">
         <div className="p-6 border-b">
@@ -273,10 +267,6 @@ export default function LibrarianDashboardPage() {
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
-          </Button>
-          <Button variant="outline" className="w-full" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
           </Button>
         </div>
       </aside>
@@ -683,6 +673,7 @@ export default function LibrarianDashboardPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }

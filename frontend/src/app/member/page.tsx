@@ -7,7 +7,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, BookOpen, LogOut, Library, ArrowLeft } from 'lucide-react';
+import { Search, BookOpen, Library, ArrowLeft } from 'lucide-react';
+import TopBar from '@/components/TopBar';
 
 type View = 'all-books' | 'borrowed-books';
 
@@ -128,15 +129,6 @@ export default function MemberDashboardPage() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await api.auth.logout();
-      router.push('/');
-    } catch (err) {
-      console.error('Logout failed:', err);
-    }
-  };
-
   const handleViewChange = (view: View) => {
     setCurrentView(view);
     if (view === 'borrowed-books') {
@@ -147,7 +139,9 @@ export default function MemberDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50">
+      <TopBar user={user} />
+      <div className="flex">
       {/* Sidebar */}
       <aside className="w-64 bg-white shadow-md border-r flex flex-col">
         <div className="p-6 border-b">
@@ -187,7 +181,7 @@ export default function MemberDashboardPage() {
           </button>
         </nav>
 
-        <div className="p-4 border-t space-y-2">
+        <div className="p-4 border-t">
           <Button
             variant="outline"
             className="w-full"
@@ -195,10 +189,6 @@ export default function MemberDashboardPage() {
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
-          </Button>
-          <Button variant="outline" className="w-full" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
           </Button>
         </div>
       </aside>
@@ -415,6 +405,7 @@ export default function MemberDashboardPage() {
           )}
         </div>
       </main>
+      </div>
     </div>
   );
 }
