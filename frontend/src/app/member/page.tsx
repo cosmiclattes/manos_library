@@ -282,7 +282,7 @@ export default function MemberDashboardPage() {
                     {paginatedAllBooks.map((book) => (
                     <Card
                       key={book.id}
-                      className="hover:shadow-md transition-shadow"
+                      className="border border-gray-300 hover:shadow-md transition-shadow"
                     >
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start">
@@ -397,7 +397,7 @@ export default function MemberDashboardPage() {
                     {paginatedBorrowedBooks.map((record) => (
                     <Card
                       key={record.id}
-                      className="hover:shadow-md transition-shadow"
+                      className="border border-gray-300 hover:shadow-md transition-shadow"
                     >
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start">

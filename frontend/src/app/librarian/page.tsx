@@ -441,7 +441,7 @@ export default function LibrarianDashboardPage() {
                 <>
                   <div className="grid gap-4">
                     {paginatedUsers.map((userItem) => (
-                      <Card key={userItem.id} className="hover:shadow-md transition-shadow">
+                      <Card key={userItem.id} className="border border-gray-300 hover:shadow-md transition-shadow">
                         <CardContent className="p-6">
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
@@ -582,7 +582,7 @@ export default function LibrarianDashboardPage() {
                     {paginatedBooks.map((book) => (
                 <Card
                   key={book.id}
-                  className="hover:shadow-md transition-shadow"
+                  className="border border-gray-300 hover:shadow-md transition-shadow"
                 >
                   <CardContent className="p-6">
                     <div className="flex justify-between items-start">
