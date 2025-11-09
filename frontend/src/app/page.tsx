@@ -25,8 +25,8 @@ export default function HomePage() {
   }, [router]);
 
   const handleLogin = () => {
-    // Redirect to FastAPI Google OAuth
-    window.location.href = 'http://localhost:8000/auth/login/google';
+    // Redirect to FastAPI Google OAuth using API client
+    api.auth.loginWithGoogle();
   };
 
   return (
