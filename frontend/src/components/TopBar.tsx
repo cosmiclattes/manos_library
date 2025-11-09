@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { UserCircle, LogOut } from 'lucide-react';
+import { User as UserIcon, LogOut } from 'lucide-react';
 
 interface TopBarProps {
   user: User | null;
@@ -59,14 +59,11 @@ export default function TopBar({ user }: TopBarProps) {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent open={dropdownOpen} onClose={() => setDropdownOpen(false)}>
-            {/* User details */}
-            <div className="px-4 py-3">
-              <p className="text-sm font-medium text-gray-900">{user.name}</p>
-              <p className="text-xs text-gray-500">{user.email}</p>
-              <p className="text-xs text-gray-400 mt-1 capitalize">
-                Role: {user.user_type.replace('_', ' ')}
-              </p>
-            </div>
+            {/* User profile link */}
+            <DropdownMenuItem onClick={() => { router.push('/profile'); setDropdownOpen(false); }}>
+              <UserIcon className="h-4 w-4" />
+              <span>{user.name}</span>
+            </DropdownMenuItem>
 
             <DropdownMenuSeparator />
 
