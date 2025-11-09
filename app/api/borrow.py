@@ -19,6 +19,13 @@ def borrow_book(
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
 
+    # Check if book is in circulation
+    if not book.in_circulation:
+        raise HTTPException(
+            status_code=400,
+            detail="This book is not available for circulation"
+        )
+
     inventory = db.query(BookInventory).filter(
         BookInventory.book_id == borrow.book_id
     ).first()

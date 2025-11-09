@@ -350,11 +350,18 @@ export default function MemberDashboardPage() {
                                     : 'Not available'}
                                 </Badge>
                               )}
+                              {!book.in_circulation && (
+                                <Badge variant="destructive">
+                                  Not in Circulation
+                                </Badge>
+                              )}
                             </div>
                           </div>
                           <div className="ml-4">
                             {book.is_borrowed_by_user ? (
                               <Badge variant="secondary">Already Borrowed</Badge>
+                            ) : !book.in_circulation ? (
+                              <Badge variant="outline">Not Available</Badge>
                             ) : (
                               <Button
                                 onClick={() => handleBorrow(book.id)}

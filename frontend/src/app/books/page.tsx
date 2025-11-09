@@ -244,6 +244,8 @@ export default function BooksPage() {
                       <TableCell>
                         {book.is_borrowed_by_user ? (
                           <Badge variant="secondary">Already Borrowed</Badge>
+                        ) : !book.in_circulation ? (
+                          <Badge variant="outline">Not Available</Badge>
                         ) : (
                           <Button
                             size="sm"

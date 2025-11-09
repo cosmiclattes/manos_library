@@ -66,6 +66,7 @@ export default function LibrarianDashboardPage() {
   const [addingBook, setAddingBook] = useState(false);
   const [editingBook, setEditingBook] = useState(false);
   const [editingInventory, setEditingInventory] = useState(false);
+  const [togglingCirculationId, setTogglingCirculationId] = useState<number | null>(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -170,6 +171,20 @@ export default function LibrarianDashboardPage() {
       showToast(err instanceof Error ? err.message : 'Failed to update user role', 'error');
     } finally {
       setChangingRoleUserId(null);
+    }
+  };
+
+  const handleToggleCirculation = async (bookId: number, currentStatus: boolean) => {
+    try {
+      setTogglingCirculationId(bookId);
+      await api.books.toggleCirculation(bookId);
+      const statusText = currentStatus ? 'removed from' : 'added to';
+      showToast(`Book ${statusText} circulation successfully!`, 'success');
+      loadBooks(); // Refresh the list
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Failed to update circulation status', 'error');
+    } finally {
+      setTogglingCirculationId(null);
     }
   };
 
@@ -680,26 +695,49 @@ export default function LibrarianDashboardPage() {
                               Borrowed: {book.inventory.borrowed_copies}
                             </Badge>
                           )}
+                          <Badge variant={book.in_circulation ? 'default' : 'destructive'}>
+                            {book.in_circulation ? 'In Circulation' : 'Not in Circulation'}
+                          </Badge>
                         </div>
                       </div>
-                      <div className="ml-4 flex gap-2">
+                      <div className="ml-4 flex flex-col gap-2">
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openEditBookDialog(book)}
+                            className="transition-all hover:scale-105 active:scale-95"
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Edit Book
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openEditInventoryDialog(book)}
+                            className="transition-all hover:scale-105 active:scale-95"
+                          >
+                            <Package className="h-4 w-4 mr-1" />
+                            Edit Inventory
+                          </Button>
+                        </div>
                         <Button
-                          variant="outline"
+                          variant={book.in_circulation ? 'destructive' : 'default'}
                           size="sm"
-                          onClick={() => openEditBookDialog(book)}
+                          onClick={() => handleToggleCirculation(book.id, book.in_circulation)}
+                          disabled={togglingCirculationId === book.id}
                           className="transition-all hover:scale-105 active:scale-95"
                         >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit Book
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openEditInventoryDialog(book)}
-                          className="transition-all hover:scale-105 active:scale-95"
-                        >
-                          <Package className="h-4 w-4 mr-1" />
-                          Edit Inventory
+                          {togglingCirculationId === book.id ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Updating...
+                            </>
+                          ) : book.in_circulation ? (
+                            'Remove from Circulation'
+                          ) : (
+                            'Add to Circulation'
+                          )}
                         </Button>
                       </div>
                     </div>

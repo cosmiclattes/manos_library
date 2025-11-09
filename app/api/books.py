@@ -184,3 +184,25 @@ def delete_book(
     db.delete(db_book)
     db.commit()
     return None
+
+
+@router.post("/{book_id}/toggle-circulation", response_model=BookResponse)
+def toggle_book_circulation(
+    book_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_librarian)
+):
+    """
+    Toggle the circulation status of a book.
+    Only librarians can mark books as in/out of circulation.
+    """
+    db_book = db.query(Book).filter(Book.id == book_id).first()
+    if not db_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    # Toggle the circulation status
+    db_book.in_circulation = not db_book.in_circulation
+
+    db.commit()
+    db.refresh(db_book)
+    return db_book

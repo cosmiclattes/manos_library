@@ -40,6 +40,7 @@ class Book(Base):
     summary = Column(Text, nullable=True)
     genre = Column(String(100), nullable=True, index=True)
     year_of_publishing = Column(Integer, nullable=True)
+    in_circulation = Column(Boolean, default=True, nullable=False)
 
     inventory = relationship("BookInventory", back_populates="book", uselist=False)
     borrow_records = relationship("BorrowRecord", back_populates="book")

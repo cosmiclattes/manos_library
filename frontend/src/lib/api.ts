@@ -44,6 +44,7 @@ export interface Book {
   summary?: string;
   genre?: string;
   year_of_publishing?: number;
+  in_circulation: boolean;
   inventory?: {
     id: number;
     book_id: number;
@@ -167,6 +168,11 @@ class APIClient {
     delete: (id: number) =>
       this.request<void>(`/books/${id}`, {
         method: 'DELETE',
+      }),
+
+    toggleCirculation: (id: number) =>
+      this.request<Book>(`/books/${id}/toggle-circulation`, {
+        method: 'POST',
       }),
   };
 

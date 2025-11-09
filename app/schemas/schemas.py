@@ -28,6 +28,7 @@ class BookBase(BaseModel):
     summary: Optional[str] = None
     genre: Optional[str] = None
     year_of_publishing: Optional[int] = None
+    in_circulation: bool = True
 
 
 class BookCreate(BookBase):
@@ -41,6 +42,7 @@ class BookUpdate(BaseModel):
     summary: Optional[str] = None
     genre: Optional[str] = None
     year_of_publishing: Optional[int] = None
+    in_circulation: Optional[bool] = None
 
 
 class BookResponse(BookBase):
