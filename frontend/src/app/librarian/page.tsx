@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { Search, BookOpen, Library, ArrowLeft, Plus, Edit, Package } from 'lucide-react';
 import TopBar from '@/components/TopBar';
+import { Pagination } from '@/components/ui/pagination';
 
 type View = 'all-books' | 'add-book';
 
@@ -44,6 +45,10 @@ export default function LibrarianDashboardPage() {
   const [currentView, setCurrentView] = useState<View>('all-books');
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Dialog states
   const [addBookDialogOpen, setAddBookDialogOpen] = useState(false);
@@ -93,6 +98,7 @@ export default function LibrarianDashboardPage() {
       const data = await api.books.list();
       const sortedBooks = data.sort((a, b) => b.id - a.id);
       setBooks(sortedBooks);
+      setCurrentPage(1); // Reset to first page
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load books');
     } finally {
@@ -115,6 +121,7 @@ export default function LibrarianDashboardPage() {
       });
       const sortedBooks = data.sort((a, b) => b.id - a.id);
       setBooks(sortedBooks);
+      setCurrentPage(1); // Reset to first page
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Search failed');
     } finally {
@@ -220,6 +227,17 @@ export default function LibrarianDashboardPage() {
     }
   };
 
+  // Calculate pagination
+  const totalPages = Math.ceil(books.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedBooks = books.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <TopBar user={user} />
@@ -322,8 +340,9 @@ export default function LibrarianDashboardPage() {
               No books found. Try a different search.
             </div>
           ) : (
-            <div className="grid gap-4">
-              {books.map((book) => (
+            <>
+              <div className="grid gap-4">
+                {paginatedBooks.map((book) => (
                 <Card
                   key={book.id}
                   className="hover:shadow-md transition-shadow"
@@ -399,7 +418,17 @@ export default function LibrarianDashboardPage() {
                   </CardContent>
                 </Card>
               ))}
-            </div>
+              </div>
+
+              {/* Pagination */}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                totalItems={books.length}
+                itemsPerPage={itemsPerPage}
+              />
+            </>
           )}
         </div>
       </main>

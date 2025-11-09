@@ -16,6 +16,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Search, BookOpen, LogOut, Home } from 'lucide-react';
+import { Pagination } from '@/components/ui/pagination';
 
 export default function BooksPage() {
   const router = useRouter();
@@ -24,6 +25,10 @@ export default function BooksPage() {
   const [searchTitle, setSearchTitle] = useState('');
   const [searchAuthor, setSearchAuthor] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     loadBooks();
@@ -35,6 +40,7 @@ export default function BooksPage() {
       setError(null);
       const data = await api.books.list();
       setBooks(data);
+      setCurrentPage(1); // Reset to first page
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load books');
     } finally {
@@ -56,6 +62,7 @@ export default function BooksPage() {
         author: searchAuthor || undefined,
       });
       setBooks(data);
+      setCurrentPage(1); // Reset to first page
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Search failed');
     } finally {
@@ -80,6 +87,17 @@ export default function BooksPage() {
     } catch (err) {
       console.error('Logout failed:', err);
     }
+  };
+
+  // Calculate pagination
+  const totalPages = Math.ceil(books.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedBooks = books.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -164,19 +182,20 @@ export default function BooksPage() {
                 No books found. Try a different search.
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Author</TableHead>
-                    <TableHead>Genre</TableHead>
-                    <TableHead>Year</TableHead>
-                    <TableHead>Available</TableHead>
-                    <TableHead>Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {books.map((book) => (
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Author</TableHead>
+                      <TableHead>Genre</TableHead>
+                      <TableHead>Year</TableHead>
+                      <TableHead>Available</TableHead>
+                      <TableHead>Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedBooks.map((book) => (
                     <TableRow key={book.id}>
                       <TableCell className="font-medium">{book.title}</TableCell>
                       <TableCell>{book.author}</TableCell>
@@ -212,8 +231,20 @@ export default function BooksPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-                </TableBody>
-              </Table>
+                  </TableBody>
+                </Table>
+
+                {/* Pagination */}
+                <div className="mt-4">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                    totalItems={books.length}
+                    itemsPerPage={itemsPerPage}
+                  />
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

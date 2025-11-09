@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Search, BookOpen, Library, ArrowLeft } from 'lucide-react';
 import TopBar from '@/components/TopBar';
+import { Pagination } from '@/components/ui/pagination';
 
 type View = 'all-books' | 'borrowed-books';
 
@@ -28,6 +29,11 @@ export default function MemberDashboardPage() {
   const [currentView, setCurrentView] = useState<View>('all-books');
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  // Pagination state
+  const [allBooksPage, setAllBooksPage] = useState(1);
+  const [borrowedBooksPage, setBorrowedBooksPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     loadUser();
@@ -51,6 +57,7 @@ export default function MemberDashboardPage() {
       // Sort by ID descending (latest first)
       const sortedBooks = data.sort((a, b) => b.id - a.id);
       setBooks(sortedBooks);
+      setAllBooksPage(1); // Reset to first page
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load books');
     } finally {
@@ -78,6 +85,7 @@ export default function MemberDashboardPage() {
       );
 
       setBorrowedBooks(booksWithDetails);
+      setBorrowedBooksPage(1); // Reset to first page
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load borrowed books');
     } finally {
@@ -102,6 +110,7 @@ export default function MemberDashboardPage() {
       // Sort by ID descending (latest first)
       const sortedBooks = data.sort((a, b) => b.id - a.id);
       setBooks(sortedBooks);
+      setAllBooksPage(1); // Reset to first page
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Search failed');
     } finally {
@@ -136,6 +145,28 @@ export default function MemberDashboardPage() {
     } else {
       loadBooks();
     }
+  };
+
+  // Calculate pagination for all books
+  const allBooksTotalPages = Math.ceil(books.length / itemsPerPage);
+  const allBooksStartIndex = (allBooksPage - 1) * itemsPerPage;
+  const allBooksEndIndex = allBooksStartIndex + itemsPerPage;
+  const paginatedAllBooks = books.slice(allBooksStartIndex, allBooksEndIndex);
+
+  // Calculate pagination for borrowed books
+  const borrowedBooksTotalPages = Math.ceil(borrowedBooks.length / itemsPerPage);
+  const borrowedBooksStartIndex = (borrowedBooksPage - 1) * itemsPerPage;
+  const borrowedBooksEndIndex = borrowedBooksStartIndex + itemsPerPage;
+  const paginatedBorrowedBooks = borrowedBooks.slice(borrowedBooksStartIndex, borrowedBooksEndIndex);
+
+  const handleAllBooksPageChange = (page: number) => {
+    setAllBooksPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleBorrowedBooksPageChange = (page: number) => {
+    setBorrowedBooksPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -246,8 +277,9 @@ export default function MemberDashboardPage() {
                   No books found. Try a different search.
                 </div>
               ) : (
-                <div className="grid gap-4">
-                  {books.map((book) => (
+                <>
+                  <div className="grid gap-4">
+                    {paginatedAllBooks.map((book) => (
                     <Card
                       key={book.id}
                       className="hover:shadow-md transition-shadow"
@@ -310,7 +342,17 @@ export default function MemberDashboardPage() {
                       </CardContent>
                     </Card>
                   ))}
-                </div>
+                  </div>
+
+                  {/* Pagination */}
+                  <Pagination
+                    currentPage={allBooksPage}
+                    totalPages={allBooksTotalPages}
+                    onPageChange={handleAllBooksPageChange}
+                    totalItems={books.length}
+                    itemsPerPage={itemsPerPage}
+                  />
+                </>
               )}
             </>
           ) : (
@@ -350,8 +392,9 @@ export default function MemberDashboardPage() {
                   </CardContent>
                 </Card>
               ) : (
-                <div className="grid gap-4">
-                  {borrowedBooks.map((record) => (
+                <>
+                  <div className="grid gap-4">
+                    {paginatedBorrowedBooks.map((record) => (
                     <Card
                       key={record.id}
                       className="hover:shadow-md transition-shadow"
@@ -399,7 +442,17 @@ export default function MemberDashboardPage() {
                       </CardContent>
                     </Card>
                   ))}
-                </div>
+                  </div>
+
+                  {/* Pagination */}
+                  <Pagination
+                    currentPage={borrowedBooksPage}
+                    totalPages={borrowedBooksTotalPages}
+                    onPageChange={handleBorrowedBooksPageChange}
+                    totalItems={borrowedBooks.length}
+                    itemsPerPage={itemsPerPage}
+                  />
+                </>
               )}
             </>
           )}
