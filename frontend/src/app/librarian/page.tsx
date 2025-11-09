@@ -387,77 +387,6 @@ export default function LibrarianDashboardPage() {
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
         <div className="container mx-auto px-8 py-8">
-          {/* Dashboard Stats */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-6">
-              Dashboard
-            </h1>
-            {statsLoading ? (
-              <div className="text-center py-8 text-gray-500">Loading statistics...</div>
-            ) : stats ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <StatCard
-                  title="Total Books"
-                  value={stats.total_books}
-                  icon={BookOpen}
-                  iconColor="text-blue-600"
-                />
-                <StatCard
-                  title="Total Users"
-                  value={stats.total_users}
-                  icon={Users}
-                  iconColor="text-green-600"
-                />
-                <StatCard
-                  title="Total Books Borrowed"
-                  value={stats.total_borrowed}
-                  icon={BookMarked}
-                  iconColor="text-purple-600"
-                />
-              </div>
-            ) : null}
-          </div>
-
-          {/* Search Section */}
-          <div className="mb-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">
-              Manage Books
-            </h2>
-            <div className="flex gap-4 max-w-2xl">
-              <Input
-                placeholder="Search by title or author..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="flex-1"
-              />
-              <Button onClick={handleSearch}>
-                <Search className="h-4 w-4 mr-2" />
-                Search
-              </Button>
-              {searchQuery && (
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSearchQuery('');
-                    loadBooks();
-                  }}
-                >
-                  Clear
-                </Button>
-              )}
-            </div>
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <Card className="mb-6 border-red-200 bg-red-50">
-              <CardContent className="pt-6">
-                <p className="text-red-600">{error}</p>
-              </CardContent>
-            </Card>
-          )}
-
           {/* Conditional View Rendering */}
           {currentView === 'users' ? (
             <>
@@ -491,6 +420,15 @@ export default function LibrarianDashboardPage() {
                   )}
                 </div>
               </div>
+
+              {/* Error Message */}
+              {error && (
+                <Card className="mb-6 border-red-200 bg-red-50">
+                  <CardContent className="pt-6">
+                    <p className="text-red-600">{error}</p>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Users List */}
               {usersLoading ? (
@@ -560,6 +498,77 @@ export default function LibrarianDashboardPage() {
             </>
           ) : (
             <>
+              {/* Dashboard Stats */}
+              <div className="mb-8">
+                <h1 className="text-2xl font-bold text-gray-900 mb-6">
+                  Dashboard
+                </h1>
+                {statsLoading ? (
+                  <div className="text-center py-8 text-gray-500">Loading statistics...</div>
+                ) : stats ? (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <StatCard
+                      title="Total Books"
+                      value={stats.total_books}
+                      icon={BookOpen}
+                      iconColor="text-blue-600"
+                    />
+                    <StatCard
+                      title="Total Users"
+                      value={stats.total_users}
+                      icon={Users}
+                      iconColor="text-green-600"
+                    />
+                    <StatCard
+                      title="Total Books Borrowed"
+                      value={stats.total_borrowed}
+                      icon={BookMarked}
+                      iconColor="text-purple-600"
+                    />
+                  </div>
+                ) : null}
+              </div>
+
+              {/* Search Section */}
+              <div className="mb-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-6">
+                  Manage Books
+                </h2>
+                <div className="flex gap-4 max-w-2xl">
+                  <Input
+                    placeholder="Search by title or author..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                    className="flex-1"
+                  />
+                  <Button onClick={handleSearch}>
+                    <Search className="h-4 w-4 mr-2" />
+                    Search
+                  </Button>
+                  {searchQuery && (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setSearchQuery('');
+                        loadBooks();
+                      }}
+                    >
+                      Clear
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <Card className="mb-6 border-red-200 bg-red-50">
+                  <CardContent className="pt-6">
+                    <p className="text-red-600">{error}</p>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Books List */}
               {loading ? (
                 <div className="text-center py-12 text-gray-500">Loading...</div>
