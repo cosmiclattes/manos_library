@@ -5,26 +5,36 @@
 const getApiUrl = () => {
   const envUrl = process.env.NEXT_PUBLIC_API_URL;
 
+  console.log('=== API URL Configuration ===');
+  console.log('NEXT_PUBLIC_API_URL:', envUrl);
+  console.log('window.location.hostname:', typeof window !== 'undefined' ? window.location.hostname : 'N/A');
+
   // If set to special value "SAME_ORIGIN", use empty string for same-origin requests
   if (envUrl === 'SAME_ORIGIN') {
+    console.log('Using SAME_ORIGIN mode - returning empty string');
     return '';
   }
 
   // If explicitly set, use it
   if (envUrl) {
+    console.log('Using explicit env URL:', envUrl);
     return envUrl;
   }
 
   // Development fallback: use localhost if running on localhost
   if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    console.log('Running on localhost - using http://localhost:8000');
     return 'http://localhost:8000';
   }
 
   // Default: same-origin requests
+  console.log('Using default - empty string for same-origin');
   return '';
 };
 
 const API_URL = getApiUrl();
+console.log('Final API_URL:', API_URL);
+console.log('=============================');
 
 export interface Book {
   id: number;
