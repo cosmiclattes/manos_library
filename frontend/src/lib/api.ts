@@ -110,6 +110,7 @@ class APIClient {
     loginWithGoogle: () => {
       console.log('=== loginWithGoogle called ===');
       console.log('this.baseURL:', this.baseURL);
+      debugger;
       const redirectUrl = `${this.baseURL}/auth/login/google`;
       console.log('Redirecting to:', redirectUrl);
       console.log('==============================');
