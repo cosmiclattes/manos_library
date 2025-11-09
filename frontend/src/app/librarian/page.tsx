@@ -22,7 +22,7 @@ import TopBar from '@/components/TopBar';
 import { Pagination } from '@/components/ui/pagination';
 import StatCard from '@/components/StatCard';
 
-type View = 'all-books' | 'add-book';
+type View = 'all-books' | 'add-book' | 'users';
 
 interface BookFormData {
   title: string;
@@ -51,8 +51,14 @@ export default function LibrarianDashboardPage() {
   const [stats, setStats] = useState<LibrarianStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
 
+  // Users state
+  const [users, setUsers] = useState<User[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
+  const [usersPage, setUsersPage] = useState(1);
   const itemsPerPage = 10;
 
   // Dialog states
@@ -106,6 +112,50 @@ export default function LibrarianDashboardPage() {
       console.error('Failed to load stats:', err);
     } finally {
       setStatsLoading(false);
+    }
+  };
+
+  const loadUsers = async () => {
+    try {
+      setUsersLoading(true);
+      setError(null);
+      const data = await api.users.list();
+      setUsers(data);
+      setUsersPage(1); // Reset to first page
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load users');
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
+  const handleUserSearch = async () => {
+    if (!userSearchQuery.trim()) {
+      loadUsers();
+      return;
+    }
+
+    try {
+      setUsersLoading(true);
+      setError(null);
+      const data = await api.users.list({ search: userSearchQuery });
+      setUsers(data);
+      setUsersPage(1); // Reset to first page
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'User search failed');
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
+  const handleUserRoleChange = async (userId: number, newRole: 'member' | 'librarian') => {
+    try {
+      await api.users.updateRole(userId, newRole);
+      alert('User role updated successfully!');
+      loadUsers(); // Refresh the list
+      loadStats(); // Refresh stats
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to update user role');
     }
   };
 
@@ -244,10 +294,12 @@ export default function LibrarianDashboardPage() {
     if (view === 'add-book') {
       setAddBookDialogOpen(true);
       setCurrentView('all-books');
+    } else if (view === 'users') {
+      loadUsers();
     }
   };
 
-  // Calculate pagination
+  // Calculate pagination for books
   const totalPages = Math.ceil(books.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -255,6 +307,17 @@ export default function LibrarianDashboardPage() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Calculate pagination for users
+  const usersTotalPages = Math.ceil(users.length / itemsPerPage);
+  const usersStartIndex = (usersPage - 1) * itemsPerPage;
+  const usersEndIndex = usersStartIndex + itemsPerPage;
+  const paginatedUsers = users.slice(usersStartIndex, usersEndIndex);
+
+  const handleUsersPageChange = (page: number) => {
+    setUsersPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -294,6 +357,18 @@ export default function LibrarianDashboardPage() {
           >
             <Plus className="h-5 w-5" />
             Add Book
+          </button>
+
+          <button
+            onClick={() => handleViewChange('users')}
+            className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-3 transition-colors ${
+              currentView === 'users'
+                ? 'bg-blue-50 text-blue-700 font-medium'
+                : 'text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <Users className="h-5 w-5" />
+            Manage Users
           </button>
         </nav>
 
@@ -383,17 +458,119 @@ export default function LibrarianDashboardPage() {
             </Card>
           )}
 
-          {/* Books List */}
-          {loading ? (
-            <div className="text-center py-12 text-gray-500">Loading...</div>
-          ) : books.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              No books found. Try a different search.
-            </div>
+          {/* Conditional View Rendering */}
+          {currentView === 'users' ? (
+            <>
+              {/* Users Management View */}
+              <div className="mb-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-6">
+                  Manage Users
+                </h2>
+                <div className="flex gap-4 max-w-2xl mb-6">
+                  <Input
+                    placeholder="Search by name or email..."
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleUserSearch()}
+                    className="flex-1"
+                  />
+                  <Button onClick={handleUserSearch}>
+                    <Search className="h-4 w-4 mr-2" />
+                    Search
+                  </Button>
+                  {userSearchQuery && (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setUserSearchQuery('');
+                        loadUsers();
+                      }}
+                    >
+                      Clear
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* Users List */}
+              {usersLoading ? (
+                <div className="text-center py-12 text-gray-500">Loading...</div>
+              ) : users.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  No users found.
+                </div>
+              ) : (
+                <>
+                  <div className="grid gap-4">
+                    {paginatedUsers.map((userItem) => (
+                      <Card key={userItem.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-6">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                                {userItem.name}
+                              </h3>
+                              <p className="text-gray-600 mb-2">{userItem.email}</p>
+                              <Badge variant="outline">{userItem.user_type.replace('_', ' ')}</Badge>
+                            </div>
+                            <div className="ml-4">
+                              {userItem.user_type !== 'super_admin' && userItem.id !== user?.id && (
+                                <div className="flex gap-2">
+                                  <Button
+                                    variant={userItem.user_type === 'member' ? 'default' : 'outline'}
+                                    size="sm"
+                                    onClick={() => handleUserRoleChange(userItem.id, 'member')}
+                                    disabled={userItem.user_type === 'member'}
+                                  >
+                                    Member
+                                  </Button>
+                                  <Button
+                                    variant={userItem.user_type === 'librarian' ? 'default' : 'outline'}
+                                    size="sm"
+                                    onClick={() => handleUserRoleChange(userItem.id, 'librarian')}
+                                    disabled={userItem.user_type === 'librarian'}
+                                  >
+                                    Librarian
+                                  </Button>
+                                </div>
+                              )}
+                              {userItem.user_type === 'super_admin' && (
+                                <Badge>Super Admin</Badge>
+                              )}
+                              {userItem.id === user?.id && (
+                                <Badge variant="secondary">You</Badge>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+
+                  {/* Pagination */}
+                  <Pagination
+                    currentPage={usersPage}
+                    totalPages={usersTotalPages}
+                    onPageChange={handleUsersPageChange}
+                    totalItems={users.length}
+                    itemsPerPage={itemsPerPage}
+                  />
+                </>
+              )}
+            </>
           ) : (
             <>
-              <div className="grid gap-4">
-                {paginatedBooks.map((book) => (
+              {/* Books List */}
+              {loading ? (
+                <div className="text-center py-12 text-gray-500">Loading...</div>
+              ) : books.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  No books found. Try a different search.
+                </div>
+              ) : (
+                <>
+                  <div className="grid gap-4">
+                    {paginatedBooks.map((book) => (
                 <Card
                   key={book.id}
                   className="hover:shadow-md transition-shadow"
@@ -479,6 +656,8 @@ export default function LibrarianDashboardPage() {
                 totalItems={books.length}
                 itemsPerPage={itemsPerPage}
               />
+            </>
+          )}
             </>
           )}
         </div>

@@ -208,6 +208,25 @@ class APIClient {
   stats = {
     getLibrarianStats: () => this.request<LibrarianStats>('/stats/librarian'),
   };
+
+  // User management endpoints
+  users = {
+    list: (params?: { search?: string; skip?: number; limit?: number }) => {
+      const queryParams = new URLSearchParams();
+      if (params?.search) queryParams.append('search', params.search);
+      if (params?.skip !== undefined) queryParams.append('skip', params.skip.toString());
+      if (params?.limit !== undefined) queryParams.append('limit', params.limit.toString());
+
+      const query = queryParams.toString();
+      return this.request<User[]>(`/users/${query ? `?${query}` : ''}`);
+    },
+
+    updateRole: (userId: number, userType: 'member' | 'librarian') =>
+      this.request<User>(`/users/${userId}/role`, {
+        method: 'PUT',
+        body: JSON.stringify({ user_type: userType }),
+      }),
+  };
 }
 
 export const api = new APIClient(API_URL);

@@ -6,7 +6,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from pathlib import Path
 import os
 import logging
-from app.api import auth, books, inventory, borrow, stats
+from app.api import auth, books, inventory, borrow, stats, users
 from app.database import engine
 from app.models import models
 from app.config import get_settings
@@ -72,6 +72,7 @@ app.include_router(books.router)
 app.include_router(inventory.router)
 app.include_router(borrow.router)
 app.include_router(stats.router)
+app.include_router(users.router)
 
 logger.info("All routers registered")
 
