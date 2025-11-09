@@ -221,13 +221,17 @@ export default function BooksPage() {
                         )}
                       </TableCell>
                       <TableCell>
-                        <Button
-                          size="sm"
-                          onClick={() => handleBorrow(book.id)}
-                          disabled={!book.available_copies || book.available_copies <= 0}
-                        >
-                          Borrow
-                        </Button>
+                        {book.is_borrowed_by_user ? (
+                          <Badge variant="secondary">Already Borrowed</Badge>
+                        ) : (
+                          <Button
+                            size="sm"
+                            onClick={() => handleBorrow(book.id)}
+                            disabled={!book.available_copies || book.available_copies <= 0}
+                          >
+                            Borrow
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}

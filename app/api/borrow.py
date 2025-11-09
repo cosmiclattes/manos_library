@@ -36,18 +36,35 @@ def borrow_book(
             detail="No copies available for borrowing"
         )
 
-    existing_record = db.query(BorrowRecord).filter(
+    # Check if user already has this book borrowed
+    existing_active_record = db.query(BorrowRecord).filter(
         BorrowRecord.user_id == current_user.id,
         BorrowRecord.book_id == borrow.book_id,
         BorrowRecord.delete_entry == False
     ).first()
 
-    if existing_record:
-        existing_record.borrow_count += 1
+    if existing_active_record:
+        raise HTTPException(
+            status_code=400,
+            detail="You have already borrowed this book. Please return it before borrowing again."
+        )
+
+    # Check if there's a previous borrow record (returned)
+    previous_record = db.query(BorrowRecord).filter(
+        BorrowRecord.user_id == current_user.id,
+        BorrowRecord.book_id == borrow.book_id,
+        BorrowRecord.delete_entry == True
+    ).first()
+
+    if previous_record:
+        # Reactivate the record and increment borrow count
+        previous_record.delete_entry = False
+        previous_record.borrow_count += 1
         db.commit()
-        db.refresh(existing_record)
-        borrow_record = existing_record
+        db.refresh(previous_record)
+        borrow_record = previous_record
     else:
+        # Create new borrow record
         borrow_record = BorrowRecord(
             user_id=current_user.id,
             book_id=borrow.book_id,

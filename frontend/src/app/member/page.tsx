@@ -328,15 +328,19 @@ export default function MemberDashboardPage() {
                             </div>
                           </div>
                           <div className="ml-4">
-                            <Button
-                              onClick={() => handleBorrow(book.id)}
-                              disabled={
-                                !book.available_copies ||
-                                book.available_copies <= 0
-                              }
-                            >
-                              Borrow
-                            </Button>
+                            {book.is_borrowed_by_user ? (
+                              <Badge variant="secondary">Already Borrowed</Badge>
+                            ) : (
+                              <Button
+                                onClick={() => handleBorrow(book.id)}
+                                disabled={
+                                  !book.available_copies ||
+                                  book.available_copies <= 0
+                                }
+                              >
+                                Borrow
+                              </Button>
+                            )}
                           </div>
                         </div>
                       </CardContent>

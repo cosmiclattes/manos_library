@@ -90,6 +90,7 @@ class BorrowRecordResponse(BaseModel):
 class BookWithInventory(BookResponse):
     inventory: Optional[BookInventoryResponse] = None
     available_copies: Optional[int] = None
+    is_borrowed_by_user: Optional[bool] = False
 
 
 class Token(BaseModel):

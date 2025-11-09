@@ -51,6 +51,7 @@ export interface Book {
     borrowed_copies: number;
   };
   available_copies?: number;
+  is_borrowed_by_user?: boolean;
 }
 
 export interface User {

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from typing import List, Optional
 from app.database import get_db
-from app.models.models import Book, BookInventory, User
+from app.models.models import Book, BookInventory, User, BorrowRecord
 from app.schemas.schemas import BookCreate, BookUpdate, BookResponse, BookWithInventory
 from app.dependencies.auth import require_librarian, get_current_user
 
@@ -43,6 +43,15 @@ def list_books(
         book_data = BookWithInventory.model_validate(book)
         if book.inventory:
             book_data.available_copies = book.inventory.total_copies - book.inventory.borrowed_copies
+
+        # Check if current user has borrowed this book
+        borrow_record = db.query(BorrowRecord).filter(
+            BorrowRecord.user_id == current_user.id,
+            BorrowRecord.book_id == book.id,
+            BorrowRecord.delete_entry == False
+        ).first()
+        book_data.is_borrowed_by_user = borrow_record is not None
+
         result.append(book_data)
 
     return result
@@ -103,6 +112,15 @@ def search_books(
         book_data = BookWithInventory.model_validate(book)
         if book.inventory:
             book_data.available_copies = book.inventory.total_copies - book.inventory.borrowed_copies
+
+        # Check if current user has borrowed this book
+        borrow_record = db.query(BorrowRecord).filter(
+            BorrowRecord.user_id == current_user.id,
+            BorrowRecord.book_id == book.id,
+            BorrowRecord.delete_entry == False
+        ).first()
+        book_data.is_borrowed_by_user = borrow_record is not None
+
         result.append(book_data)
 
     return result
@@ -121,6 +139,14 @@ def get_book(
     book_data = BookWithInventory.model_validate(book)
     if book.inventory:
         book_data.available_copies = book.inventory.total_copies - book.inventory.borrowed_copies
+
+    # Check if current user has borrowed this book
+    borrow_record = db.query(BorrowRecord).filter(
+        BorrowRecord.user_id == current_user.id,
+        BorrowRecord.book_id == book.id,
+        BorrowRecord.delete_entry == False
+    ).first()
+    book_data.is_borrowed_by_user = borrow_record is not None
 
     return book_data
 
