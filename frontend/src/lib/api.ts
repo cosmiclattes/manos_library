@@ -55,6 +55,10 @@ export interface Book {
   is_borrowed_by_user?: boolean;
 }
 
+export interface BookWithSimilarity extends Book {
+  similarity_score: number;
+}
+
 export interface User {
   id: number;
   name: string;
@@ -149,6 +153,14 @@ class APIClient {
       if (params.limit !== undefined) queryParams.append('limit', params.limit.toString());
 
       return this.request<Book[]>(`/books/search/?${queryParams.toString()}`);
+    },
+
+    semanticSearch: (query: string, limit: number = 10) => {
+      const queryParams = new URLSearchParams();
+      queryParams.append('query', query);
+      queryParams.append('limit', limit.toString());
+
+      return this.request<BookWithSimilarity[]>(`/books/semantic-search/?${queryParams.toString()}`);
     },
 
     get: (id: number) => this.request<Book>(`/books/${id}`),

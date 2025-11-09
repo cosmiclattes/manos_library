@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     GOOGLE_CLOUD_PROJECT: str = ""
     GOOGLE_CLOUD_LOCATION: str = "us-central1"
     GOOGLE_APPLICATION_CREDENTIALS: str = ""
+    GOOGLE_APPLICATION_CREDENTIALS_BASE64: str = ""
 
     class Config:
         # Support multiple environment files

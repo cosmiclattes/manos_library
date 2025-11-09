@@ -172,13 +172,14 @@ def semantic_search_books(
 
     # Query for similar books using cosine similarity
     # Note: Using 1 - cosine distance to get similarity score (higher = more similar)
+    # Using CAST instead of :: to avoid parameter binding issues
     query_sql = text("""
         SELECT
             b.*,
-            1 - (b.embedding <=> :query_embedding::vector) as similarity
+            1 - (b.embedding <=> CAST(:query_embedding AS vector)) as similarity
         FROM books b
         WHERE b.embedding IS NOT NULL
-        ORDER BY b.embedding <=> :query_embedding::vector
+        ORDER BY b.embedding <=> CAST(:query_embedding AS vector)
         LIMIT :limit
     """)
 
@@ -194,11 +195,12 @@ def semantic_search_books(
         book = db.query(Book).filter(Book.id == row.id).first()
 
         if book:
-            book_data = BookWithSimilarity.model_validate(book)
+            # First validate as BookWithInventory to get book data
+            book_dict = BookWithInventory.model_validate(book).model_dump()
 
             # Add inventory information
             if book.inventory:
-                book_data.available_copies = book.inventory.total_copies - book.inventory.borrowed_copies
+                book_dict['available_copies'] = book.inventory.total_copies - book.inventory.borrowed_copies
 
             # Check if current user has borrowed this book
             borrow_record = db.query(BorrowRecord).filter(
@@ -206,10 +208,13 @@ def semantic_search_books(
                 BorrowRecord.book_id == book.id,
                 BorrowRecord.delete_entry == False
             ).first()
-            book_data.is_borrowed_by_user = borrow_record is not None
+            book_dict['is_borrowed_by_user'] = borrow_record is not None
 
             # Add similarity score
-            book_data.similarity_score = float(row.similarity)
+            book_dict['similarity_score'] = float(row.similarity)
+
+            # Now create BookWithSimilarity with all required fields
+            book_data = BookWithSimilarity(**book_dict)
 
             results.append(book_data)
 
