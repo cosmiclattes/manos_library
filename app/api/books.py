@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy import or_, text
 from typing import List, Optional
 from app.database import get_db
 from app.models.models import Book, BookInventory, User, BorrowRecord
-from app.schemas.schemas import BookCreate, BookUpdate, BookResponse, BookWithInventory
+from app.schemas.schemas import BookCreate, BookUpdate, BookResponse, BookWithInventory, BookWithSimilarity
 from app.dependencies.auth import require_librarian, get_current_user
+from app.services.embedding_service import embedding_service
 
 router = APIRouter(prefix="/books", tags=["books"])
 
@@ -17,6 +18,18 @@ def create_book(
     current_user: User = Depends(require_librarian)
 ):
     db_book = Book(**book.model_dump())
+
+    # Generate embedding for the book using title, author, summary, and genre
+    embedding = embedding_service.generate_embedding(
+        title=book.title,
+        author=book.author,
+        summary=book.summary,
+        genre=book.genre
+    )
+
+    if embedding:
+        db_book.embedding = embedding
+
     db.add(db_book)
     db.commit()
     db.refresh(db_book)
@@ -126,6 +139,83 @@ def search_books(
     return result
 
 
+@router.get("/semantic-search/", response_model=List[BookWithSimilarity])
+def semantic_search_books(
+    query: str = Query(..., description="Natural language search query"),
+    limit: int = Query(10, ge=1, le=50, description="Number of results to return"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Semantic search for books using natural language queries.
+
+    Uses AI embeddings to find books based on meaning rather than exact text matches.
+
+    - **query**: Natural language description of what you're looking for
+      (e.g., "mysteries set in Victorian England", "books about space exploration")
+    - **limit**: Maximum number of results to return (1-50)
+
+    Returns books ranked by semantic similarity with similarity scores.
+    """
+
+    # Generate embedding for the search query
+    query_embedding = embedding_service.generate_query_embedding(query)
+
+    if not query_embedding:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Embedding service is not available. Please ensure Vertex AI credentials are configured."
+        )
+
+    # Convert embedding to PostgreSQL vector format
+    embedding_str = "[" + ",".join(str(x) for x in query_embedding) + "]"
+
+    # Query for similar books using cosine similarity
+    # Note: Using 1 - cosine distance to get similarity score (higher = more similar)
+    query_sql = text("""
+        SELECT
+            b.*,
+            1 - (b.embedding <=> :query_embedding::vector) as similarity
+        FROM books b
+        WHERE b.embedding IS NOT NULL
+        ORDER BY b.embedding <=> :query_embedding::vector
+        LIMIT :limit
+    """)
+
+    result_rows = db.execute(
+        query_sql,
+        {"query_embedding": embedding_str, "limit": limit}
+    ).fetchall()
+
+    # Build response with book data and similarity scores
+    results = []
+    for row in result_rows:
+        # Get the book object
+        book = db.query(Book).filter(Book.id == row.id).first()
+
+        if book:
+            book_data = BookWithSimilarity.model_validate(book)
+
+            # Add inventory information
+            if book.inventory:
+                book_data.available_copies = book.inventory.total_copies - book.inventory.borrowed_copies
+
+            # Check if current user has borrowed this book
+            borrow_record = db.query(BorrowRecord).filter(
+                BorrowRecord.user_id == current_user.id,
+                BorrowRecord.book_id == book.id,
+                BorrowRecord.delete_entry == False
+            ).first()
+            book_data.is_borrowed_by_user = borrow_record is not None
+
+            # Add similarity score
+            book_data.similarity_score = float(row.similarity)
+
+            results.append(book_data)
+
+    return results
+
+
 @router.get("/{book_id}", response_model=BookWithInventory)
 def get_book(
     book_id: int,
@@ -165,6 +255,18 @@ def update_book(
     update_data = book_update.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(db_book, field, value)
+
+    # Regenerate embedding if title, author, summary, or genre changed
+    if any(field in update_data for field in ['title', 'author', 'summary', 'genre']):
+        embedding = embedding_service.generate_embedding(
+            title=db_book.title,
+            author=db_book.author,
+            summary=db_book.summary,
+            genre=db_book.genre
+        )
+
+        if embedding:
+            db_book.embedding = embedding
 
     db.commit()
     db.refresh(db_book)
