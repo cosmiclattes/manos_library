@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { api, type Book, type User } from '@/lib/api';
+import { api, type Book, type User, type LibrarianStats } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -17,9 +17,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Search, BookOpen, Library, ArrowLeft, Plus, Edit, Package } from 'lucide-react';
+import { Search, BookOpen, Library, ArrowLeft, Plus, Edit, Package, Users, BookMarked } from 'lucide-react';
 import TopBar from '@/components/TopBar';
 import { Pagination } from '@/components/ui/pagination';
+import StatCard from '@/components/StatCard';
 
 type View = 'all-books' | 'add-book';
 
@@ -45,6 +46,10 @@ export default function LibrarianDashboardPage() {
   const [currentView, setCurrentView] = useState<View>('all-books');
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  // Stats state
+  const [stats, setStats] = useState<LibrarianStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -75,6 +80,7 @@ export default function LibrarianDashboardPage() {
   useEffect(() => {
     loadUser();
     loadBooks();
+    loadStats();
   }, []);
 
   const loadUser = async () => {
@@ -88,6 +94,18 @@ export default function LibrarianDashboardPage() {
       }
     } catch (err) {
       router.push('/');
+    }
+  };
+
+  const loadStats = async () => {
+    try {
+      setStatsLoading(true);
+      const data = await api.stats.getLibrarianStats();
+      setStats(data);
+    } catch (err) {
+      console.error('Failed to load stats:', err);
+    } finally {
+      setStatsLoading(false);
     }
   };
 
@@ -136,6 +154,7 @@ export default function LibrarianDashboardPage() {
       setAddBookDialogOpen(false);
       resetBookForm();
       loadBooks();
+      loadStats(); // Refresh stats
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to add book');
     }
@@ -172,6 +191,7 @@ export default function LibrarianDashboardPage() {
       setEditInventoryDialogOpen(false);
       resetInventoryForm();
       loadBooks();
+      loadStats(); // Refresh stats
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to update inventory');
     }
@@ -292,11 +312,42 @@ export default function LibrarianDashboardPage() {
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
         <div className="container mx-auto px-8 py-8">
+          {/* Dashboard Stats */}
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-gray-900 mb-6">
+              Dashboard
+            </h1>
+            {statsLoading ? (
+              <div className="text-center py-8 text-gray-500">Loading statistics...</div>
+            ) : stats ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <StatCard
+                  title="Total Books"
+                  value={stats.total_books}
+                  icon={BookOpen}
+                  iconColor="text-blue-600"
+                />
+                <StatCard
+                  title="Total Users"
+                  value={stats.total_users}
+                  icon={Users}
+                  iconColor="text-green-600"
+                />
+                <StatCard
+                  title="Total Books Borrowed"
+                  value={stats.total_borrowed}
+                  icon={BookMarked}
+                  iconColor="text-purple-600"
+                />
+              </div>
+            ) : null}
+          </div>
+
           {/* Search Section */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
               Manage Books
-            </h1>
+            </h2>
             <div className="flex gap-4 max-w-2xl">
               <Input
                 placeholder="Search by title or author..."

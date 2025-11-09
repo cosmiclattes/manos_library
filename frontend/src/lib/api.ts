@@ -69,6 +69,12 @@ export interface BorrowRecord {
   delete_entry: boolean;
 }
 
+export interface LibrarianStats {
+  total_books: number;
+  total_users: number;
+  total_borrowed: number;
+}
+
 class APIClient {
   private baseURL: string;
 
@@ -196,6 +202,11 @@ class APIClient {
     getMyBooks: () => this.request<BorrowRecord[]>('/borrow/my-books'),
 
     getHistory: () => this.request<BorrowRecord[]>('/borrow/history'),
+  };
+
+  // Stats endpoints
+  stats = {
+    getLibrarianStats: () => this.request<LibrarianStats>('/stats/librarian'),
   };
 }
 
