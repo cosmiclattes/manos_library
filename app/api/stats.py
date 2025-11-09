@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.database import get_db
-from app.models.models import Book, User, Inventory
+from app.models.models import Book, User, BookInventory
 from app.dependencies.auth import get_current_user, require_librarian
 
 router = APIRouter(prefix="/stats", tags=["statistics"])
@@ -24,7 +24,7 @@ async def get_librarian_stats(
     total_users = db.query(func.count(User.id)).scalar()
 
     # Total books borrowed (sum of all borrowed_copies)
-    total_borrowed = db.query(func.sum(Inventory.borrowed_copies)).scalar() or 0
+    total_borrowed = db.query(func.sum(BookInventory.borrowed_copies)).scalar() or 0
 
     return {
         "total_books": total_books,
