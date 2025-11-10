@@ -6,8 +6,11 @@ import BookRecommendationChat from "@/components/BookRecommendationChat";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Library Management System",
-  description: "Manage your library books, inventory, and borrowing",
+  title: "Manos Library",
+  description: "Read, Learn, Grow",
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
