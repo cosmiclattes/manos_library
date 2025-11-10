@@ -310,7 +310,7 @@ export default function MemberDashboardPage() {
                           <div className="flex-1">
                             <h3
                               className="text-xl font-semibold text-gray-900 mb-2 cursor-pointer hover:text-primary transition-colors"
-                              onClick={() => router.push(`/books/${book.id}`)}
+                              onClick={() => router.push(`/book-detail?id=${book.id}`)}
                             >
                               {book.title}
                             </h3>

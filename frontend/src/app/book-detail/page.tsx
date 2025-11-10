@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { api, type Book, type User } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -39,8 +39,8 @@ interface InventoryFormData {
 
 export default function BookDetailPage() {
   const router = useRouter();
-  const params = useParams();
-  const bookId = parseInt(params.id as string);
+  const searchParams = useSearchParams();
+  const bookId = parseInt(searchParams.get('id') || '0');
   const { toasts, showToast, hideToast } = useToast();
 
   const [user, setUser] = useState<User | null>(null);
@@ -73,6 +73,10 @@ export default function BookDetailPage() {
   });
 
   useEffect(() => {
+    if (!bookId) {
+      router.push('/books');
+      return;
+    }
     loadUser();
     loadBook();
   }, [bookId]);

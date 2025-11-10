@@ -220,7 +220,7 @@ export default function BooksPage() {
                     <TableRow key={book.id}>
                       <TableCell
                         className="font-medium cursor-pointer hover:text-primary transition-colors"
-                        onClick={() => router.push(`/books/${book.id}`)}
+                        onClick={() => router.push(`/book-detail?id=${book.id}`)}
                       >
                         {book.title}
                       </TableCell>
