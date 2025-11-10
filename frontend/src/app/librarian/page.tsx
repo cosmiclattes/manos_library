@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Search, BookOpen, Library, ArrowLeft, Plus, Edit, Package, Users, BookMarked, Loader2 } from 'lucide-react';
+import { Search, BookOpen, Library, Plus, Edit, Package, Users, BookMarked, Loader2 } from 'lucide-react';
 import TopBar from '@/components/TopBar';
 import { Pagination } from '@/components/ui/pagination';
 import StatCard from '@/components/StatCard';
@@ -419,17 +419,6 @@ export default function LibrarianDashboardPage() {
             Manage Users
           </button>
         </nav>
-
-        <div className="p-4 border-t space-y-2">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => router.push('/dashboard')}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Button>
-        </div>
       </aside>
 
       {/* Main Content */}

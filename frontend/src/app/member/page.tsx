@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, BookOpen, Library, ArrowLeft, Loader2 } from 'lucide-react';
+import { Search, BookOpen, Library, Loader2 } from 'lucide-react';
 import TopBar from '@/components/TopBar';
 import { Pagination } from '@/components/ui/pagination';
 import { useToast } from '@/hooks/useToast';
@@ -232,17 +232,6 @@ export default function MemberDashboardPage() {
             Borrowed Books
           </button>
         </nav>
-
-        <div className="p-4 border-t">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => router.push('/dashboard')}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Button>
-        </div>
       </aside>
 
       {/* Main Content */}
