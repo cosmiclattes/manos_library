@@ -41,12 +41,20 @@ docker-compose up -d
 
 3. **Configure environment (.env):**
 ```env
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+ALGORITHM=HS256
+APP_URL=the-path-to-the-backend
 DATABASE_URL=postgresql://library_user:library_password@localhost:5432/library_db
+DEBUG=True/False
+ENVIRONMENT=the-name-of-the-environment
+FRONTEND_URL=the-path-to-the-frontend
 GOOGLE_CLIENT_ID=your-client-id
 GOOGLE_CLIENT_SECRET=your-client-secret
 SECRET_KEY=your-secret-key
 GOOGLE_CLOUD_PROJECT=your-gcp-project-id
+GOOGLE_CLOUD_LOCATION=the-preferred-location
 GOOGLE_APPLICATION_CREDENTIALS_BASE64=your-base64-encoded-credentials
+SECRET_KEY=the-generated-secret-key
 ```
 
 4. **Run migrations:**
