@@ -101,7 +101,7 @@ def read_root():
     return {
         "message": "Welcome to Library Management System API",
         "docs": "/docs",
-        "version": "1.0.0"
+        "version": "1.0.1"
     }
 
 
