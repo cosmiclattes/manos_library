@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { MessageCircle, Send, X, Loader2 } from "lucide-react"
+import { MessageCircle, Send, X, Loader2, BookOpen, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -21,7 +21,7 @@ export default function BookRecommendationChat() {
     {
       id: '1',
       type: 'bot',
-      text: 'Hi! I can help you find book recommendations. Just describe what you\'re looking for!'
+      text: 'Hi there! 👋 I\'m here to help you discover your next great read. Tell me what kind of book you\'re in the mood for!'
     }
   ])
   const [input, setInput] = useState('')
@@ -78,10 +78,12 @@ export default function BookRecommendationChat() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-lg transition-all duration-200 hover:scale-110"
-          aria-label="Open book recommendation chat"
+          className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full px-6 py-4 shadow-lg transition-all duration-200 hover:scale-105 flex items-center gap-2 group"
+          aria-label="Get book suggestions"
         >
-          <MessageCircle className="h-6 w-6" />
+          <Sparkles className="h-5 w-5 animate-pulse" />
+          <span className="font-semibold">Find a Book</span>
+          <BookOpen className="h-5 w-5 group-hover:rotate-12 transition-transform" />
         </button>
       )}
 
@@ -89,10 +91,10 @@ export default function BookRecommendationChat() {
       {isOpen && (
         <div className="fixed bottom-6 right-6 z-50 w-96 h-[600px] bg-white rounded-lg shadow-2xl border flex flex-col">
           {/* Header */}
-          <div className="bg-blue-600 text-white p-4 rounded-t-lg flex items-center justify-between">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-t-lg flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5" />
-              <h3 className="font-semibold">Book Recommendations</h3>
+              <Sparkles className="h-5 w-5" />
+              <h3 className="font-semibold">Discover Books</h3>
             </div>
             <button
               onClick={() => setIsOpen(false)}
