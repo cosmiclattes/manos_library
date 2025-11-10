@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { usePathname } from "next/navigation"
-import { MessageCircle, Send, X, Loader2, BookOpen, Sparkles } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
+import { MessageCircle, Send, X, Loader2, BookOpen, Sparkles, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -18,6 +18,7 @@ interface Message {
 
 export default function BookRecommendationChat() {
   const pathname = usePathname()
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -132,12 +133,22 @@ export default function BookRecommendationChat() {
                   {message.books && message.books.length > 0 && (
                     <div className="mt-3 space-y-2">
                       {message.books.map((book) => (
-                        <Card key={book.id} className="p-3 bg-white">
-                          <div className="space-y-1">
-                            <h4 className="font-semibold text-sm text-gray-900">{book.title}</h4>
+                        <Card
+                          key={book.id}
+                          className="p-3 bg-white hover:shadow-md transition-shadow cursor-pointer"
+                          onClick={() => router.push(`/book-detail?id=${book.id}`)}
+                        >
+                          <div className="space-y-2">
+                            <div className="flex items-start justify-between gap-2">
+                              <h4 className="font-semibold text-sm text-gray-900 flex-1">{book.title}</h4>
+                              <ExternalLink className="h-3 w-3 text-primary flex-shrink-0 mt-0.5" />
+                            </div>
                             {book.summary && (
-                              <p className="text-xs text-gray-500">{book.summary}</p>
+                              <p className="text-xs text-gray-500 line-clamp-2">{book.summary}</p>
                             )}
+                            <div className="flex items-center gap-1 text-xs text-primary hover:underline">
+                              View details →
+                            </div>
                           </div>
                         </Card>
                       ))}
