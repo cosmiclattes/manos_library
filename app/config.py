@@ -15,6 +15,12 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
 
+    # Google Cloud / Vertex AI settings
+    GOOGLE_CLOUD_PROJECT: str = ""
+    GOOGLE_CLOUD_LOCATION: str = "us-central1"
+    GOOGLE_APPLICATION_CREDENTIALS: str = ""
+    GOOGLE_APPLICATION_CREDENTIALS_BASE64: str = ""
+
     class Config:
         # Support multiple environment files
         # Priority: .env.prod > .env.production > .env.staging > .env
@@ -26,3 +32,7 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings():
     return Settings()
+
+
+# Global settings instance
+settings = get_settings()

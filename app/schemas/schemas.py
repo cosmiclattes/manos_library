@@ -95,6 +95,10 @@ class BookWithInventory(BookResponse):
     is_borrowed_by_user: Optional[bool] = False
 
 
+class BookWithSimilarity(BookWithInventory):
+    similarity_score: float
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str

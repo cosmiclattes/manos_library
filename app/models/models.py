@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Text, Enum as SQLEnum
 from sqlalchemy.orm import relationship
+from pgvector.sqlalchemy import Vector
 from app.database import Base
 import enum
 
@@ -41,6 +42,7 @@ class Book(Base):
     genre = Column(String(100), nullable=True, index=True)
     year_of_publishing = Column(Integer, nullable=True)
     in_circulation = Column(Boolean, default=True, nullable=False)
+    embedding = Column(Vector(768), nullable=True)  # Vertex AI text-embedding-004 dimension
 
     inventory = relationship("BookInventory", back_populates="book", uselist=False)
     borrow_records = relationship("BorrowRecord", back_populates="book")
