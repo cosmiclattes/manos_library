@@ -41,7 +41,7 @@ COPY app/ ./app/
 COPY alembic/ ./alembic/
 COPY alembic.ini ./
 
-# Copy built frontend from previous stage
+# Copy built frontend from previous stage (static export creates 'out' directory)
 COPY --from=frontend-builder /frontend/out ./frontend/out
 
 # Expose port

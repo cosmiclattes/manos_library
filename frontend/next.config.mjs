@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Disable image optimization for compatibility
+  // Enable static export for production
+  output: process.env.NODE_ENV === 'production' ? 'export' : undefined,
+
+  // Disable image optimization for static export
   images: {
     unoptimized: true,
   },
