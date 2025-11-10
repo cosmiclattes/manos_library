@@ -8,6 +8,7 @@ import sys
 import requests
 import os
 import random
+import time
 
 # Configuration - can be overridden with environment variable or command line
 BASE_URL = os.getenv("API_URL", "http://localhost:8000")
@@ -446,6 +447,9 @@ def add_books(token):
         except Exception as e:
             print(f"✗ Error adding {book['title']}: {e}")
 
+        # Add delay to avoid rate limiting and 502 errors
+        time.sleep(2)
+
     print("=" * 60)
     print(f"Added {len(book_ids)} books successfully!\n")
     return book_ids
@@ -483,6 +487,9 @@ def add_inventory(token, book_ids):
                 print(f"✗ Failed to add inventory for Book ID {book_id}: {response.text}")
         except Exception as e:
             print(f"✗ Error adding inventory for Book ID {book_id}: {e}")
+
+        # Add delay to avoid rate limiting and 502 errors
+        time.sleep(1)
 
     print("=" * 60)
     print(f"Added inventory for {len(book_ids)} books!\n")
