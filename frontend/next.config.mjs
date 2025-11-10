@@ -1,11 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable static export for production builds
-  output: process.env.NODE_ENV === 'production' ? 'export' : undefined,
-
-  // Disable image optimization for static export
+  // Disable image optimization for compatibility
   images: {
-    unoptimized: process.env.NODE_ENV === 'production' ? true : false,
+    unoptimized: true,
   },
 
   // For development, use rewrites to proxy API requests
