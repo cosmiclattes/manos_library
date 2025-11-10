@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { User as UserIcon, LogOut } from 'lucide-react';
+import { User as UserIcon, LogOut, Library } from 'lucide-react';
 
 interface TopBarProps {
   user: User | null;
@@ -42,8 +42,9 @@ export default function TopBar({ user }: TopBarProps) {
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         {/* Left side - Logo/Title */}
         <div className="flex items-center gap-2">
+          <Library className="h-6 w-6 text-blue-600" />
           <span className="text-xl font-semibold text-gray-900">
-            Library Management System
+            Library
           </span>
         </div>
 
