@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api, type Book, type User } from '@/lib/api';
+import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { ArrowLeft, BookOpen, Edit, Package, Loader2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, Edit, Package } from 'lucide-react';
 import TopBar from '@/components/TopBar';
 import { useToast } from '@/hooks/useToast';
 import { Toast } from '@/components/ui/toast';
@@ -37,7 +38,7 @@ interface InventoryFormData {
   borrowed_copies: number;
 }
 
-export default function BookDetailPage() {
+function BookDetailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const bookId = parseInt(searchParams.get('id') || '0');
@@ -552,5 +553,17 @@ export default function BookDetailPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function BookDetailPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <BookDetailContent />
+    </Suspense>
   );
 }
