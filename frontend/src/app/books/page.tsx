@@ -218,7 +218,12 @@ export default function BooksPage() {
                   <TableBody>
                     {paginatedBooks.map((book) => (
                     <TableRow key={book.id}>
-                      <TableCell className="font-medium">{book.title}</TableCell>
+                      <TableCell
+                        className="font-medium cursor-pointer hover:text-primary transition-colors"
+                        onClick={() => router.push(`/books/${book.id}`)}
+                      >
+                        {book.title}
+                      </TableCell>
                       <TableCell>{book.author}</TableCell>
                       <TableCell>
                         {book.genre && (

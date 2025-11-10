@@ -308,7 +308,10 @@ export default function MemberDashboardPage() {
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                            <h3
+                              className="text-xl font-semibold text-gray-900 mb-2 cursor-pointer hover:text-primary transition-colors"
+                              onClick={() => router.push(`/books/${book.id}`)}
+                            >
                               {book.title}
                             </h3>
                             <p className="text-gray-600 mb-2">
