@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { usePathname } from "next/navigation"
 import { MessageCircle, Send, X, Loader2, BookOpen, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,6 +17,7 @@ interface Message {
 }
 
 export default function BookRecommendationChat() {
+  const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -26,6 +28,11 @@ export default function BookRecommendationChat() {
   ])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+
+  // Don't show on landing/login page
+  if (pathname === '/') {
+    return null
+  }
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return
