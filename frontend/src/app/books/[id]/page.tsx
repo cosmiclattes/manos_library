@@ -2,14 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-
-// Tell Next.js to generate this page statically but allow dynamic params at runtime
-export const dynamicParams = true;
-
-// Provide empty static params (page will be rendered client-side)
-export async function generateStaticParams() {
-  return [];
-}
 import { api, type Book, type User } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
