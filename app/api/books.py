@@ -181,6 +181,7 @@ def semantic_search_books(
     # Query for similar books using cosine similarity
     # Note: Using 1 - cosine distance to get similarity score (higher = more similar)
     # Using CAST instead of :: to avoid parameter binding issues
+    # Only return results with similarity >= 0.4 to ensure quality matches
     # Members should only see books that are in circulation
     if current_user.user_type.value == "member":
         query_sql = text("""
@@ -188,7 +189,9 @@ def semantic_search_books(
                 b.*,
                 1 - (b.embedding <=> CAST(:query_embedding AS vector)) as similarity
             FROM books b
-            WHERE b.embedding IS NOT NULL AND b.in_circulation = true
+            WHERE b.embedding IS NOT NULL
+                AND b.in_circulation = true
+                AND (1 - (b.embedding <=> CAST(:query_embedding AS vector))) >= 0.4
             ORDER BY b.embedding <=> CAST(:query_embedding AS vector)
             LIMIT :limit
         """)
@@ -199,6 +202,7 @@ def semantic_search_books(
                 1 - (b.embedding <=> CAST(:query_embedding AS vector)) as similarity
             FROM books b
             WHERE b.embedding IS NOT NULL
+                AND (1 - (b.embedding <=> CAST(:query_embedding AS vector))) >= 0.4
             ORDER BY b.embedding <=> CAST(:query_embedding AS vector)
             LIMIT :limit
         """)
