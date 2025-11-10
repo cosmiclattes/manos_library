@@ -108,9 +108,9 @@ export default function LibrarianDashboardPage() {
       const userData = await api.auth.getCurrentUser();
       setUser(userData);
 
-      // Redirect non-librarians
+      // Redirect non-librarians to member page
       if (userData.user_type !== 'librarian' && userData.user_type !== 'super_admin') {
-        router.push('/dashboard');
+        router.push('/member');
       }
     } catch (err) {
       router.push('/');

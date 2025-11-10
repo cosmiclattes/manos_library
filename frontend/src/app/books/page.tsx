@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Search, BookOpen, LogOut, Home, Loader2 } from 'lucide-react';
+import { Search, BookOpen, LogOut, Loader2 } from 'lucide-react';
 import { Pagination } from '@/components/ui/pagination';
 import { useToast } from '@/hooks/useToast';
 import { Toast } from '@/components/ui/toast';
@@ -130,10 +130,6 @@ export default function BooksPage() {
             <h1 className="text-2xl font-bold text-gray-900">Library Books</h1>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => router.push('/dashboard')}>
-              <Home className="h-4 w-4 mr-2" />
-              Dashboard
-            </Button>
             <Button variant="outline" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-2" />
               Logout

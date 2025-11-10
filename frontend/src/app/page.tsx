@@ -13,9 +13,13 @@ export default function HomePage() {
     // Check if user is already logged in
     const checkAuth = async () => {
       try {
-        await api.auth.getCurrentUser();
-        // If successful, user is logged in, redirect to dashboard
-        router.push('/dashboard');
+        const userData = await api.auth.getCurrentUser();
+        // Redirect based on user type
+        if (userData.user_type === 'member') {
+          router.push('/member');
+        } else if (userData.user_type === 'librarian' || userData.user_type === 'super_admin') {
+          router.push('/librarian');
+        }
       } catch (err) {
         // User is not logged in, stay on home page
       }
