@@ -46,6 +46,10 @@ def list_books(
 ):
     query = db.query(Book)
 
+    # Members should only see books that are in circulation
+    if current_user.user_type.value == "member":
+        query = query.filter(Book.in_circulation == True)
+
     if genre:
         query = query.filter(Book.genre == genre)
 
@@ -97,6 +101,10 @@ def search_books(
         )
 
     query = db.query(Book)
+
+    # Members should only see books that are in circulation
+    if current_user.user_type.value == "member":
+        query = query.filter(Book.in_circulation == True)
 
     # Build search filters
     filters = []
@@ -173,15 +181,27 @@ def semantic_search_books(
     # Query for similar books using cosine similarity
     # Note: Using 1 - cosine distance to get similarity score (higher = more similar)
     # Using CAST instead of :: to avoid parameter binding issues
-    query_sql = text("""
-        SELECT
-            b.*,
-            1 - (b.embedding <=> CAST(:query_embedding AS vector)) as similarity
-        FROM books b
-        WHERE b.embedding IS NOT NULL
-        ORDER BY b.embedding <=> CAST(:query_embedding AS vector)
-        LIMIT :limit
-    """)
+    # Members should only see books that are in circulation
+    if current_user.user_type.value == "member":
+        query_sql = text("""
+            SELECT
+                b.*,
+                1 - (b.embedding <=> CAST(:query_embedding AS vector)) as similarity
+            FROM books b
+            WHERE b.embedding IS NOT NULL AND b.in_circulation = true
+            ORDER BY b.embedding <=> CAST(:query_embedding AS vector)
+            LIMIT :limit
+        """)
+    else:
+        query_sql = text("""
+            SELECT
+                b.*,
+                1 - (b.embedding <=> CAST(:query_embedding AS vector)) as similarity
+            FROM books b
+            WHERE b.embedding IS NOT NULL
+            ORDER BY b.embedding <=> CAST(:query_embedding AS vector)
+            LIMIT :limit
+        """)
 
     result_rows = db.execute(
         query_sql,
