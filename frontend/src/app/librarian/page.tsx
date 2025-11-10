@@ -380,10 +380,6 @@ export default function LibrarianDashboardPage() {
       {/* Sidebar */}
       <aside className="w-64 bg-white shadow-md border-r flex flex-col">
         <div className="p-6 border-b">
-          <div className="flex items-center gap-2 mb-2">
-            <Library className="h-6 w-6 text-blue-600" />
-            <h2 className="text-xl font-bold text-gray-900">Library</h2>
-          </div>
           <p className="text-sm text-gray-600">{user?.name}</p>
           <Badge variant="outline" className="mt-2">
             {user?.user_type.replace('_', ' ')}
