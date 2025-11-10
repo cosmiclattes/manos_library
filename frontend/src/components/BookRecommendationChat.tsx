@@ -78,7 +78,7 @@ export default function BookRecommendationChat() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full px-6 py-4 shadow-lg transition-all duration-200 hover:scale-105 flex items-center gap-2 group"
+          className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground rounded-full px-6 py-4 shadow-lg transition-all duration-200 hover:scale-105 flex items-center gap-2 group"
           aria-label="Get book suggestions"
         >
           <Sparkles className="h-5 w-5 animate-pulse" />
@@ -91,14 +91,14 @@ export default function BookRecommendationChat() {
       {isOpen && (
         <div className="fixed bottom-6 right-6 z-50 w-96 h-[600px] bg-white rounded-lg shadow-2xl border flex flex-col">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-t-lg flex items-center justify-between">
+          <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground p-4 rounded-t-lg flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
               <h3 className="font-semibold">Discover Books</h3>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="hover:bg-blue-700 rounded p-1 transition-colors"
+              className="hover:bg-primary/80 rounded p-1 transition-colors"
               aria-label="Close chat"
             >
               <X className="h-5 w-5" />
@@ -115,8 +115,8 @@ export default function BookRecommendationChat() {
                 <div
                   className={`max-w-[80%] rounded-lg p-3 ${
                     message.type === 'user'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-900'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-secondary-foreground'
                   }`}
                 >
                   <p className="text-sm">{message.text}</p>

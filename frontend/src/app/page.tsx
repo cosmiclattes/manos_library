@@ -29,11 +29,11 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-background to-white flex items-center justify-center">
       <div className="container mx-auto px-4 py-16">
         <div className="text-center max-w-2xl mx-auto">
           <div className="flex justify-center mb-6">
-            <Library className="h-20 w-20 text-blue-600" />
+            <Library className="h-20 w-20 text-primary" />
           </div>
           <h1 className="text-6xl font-bold text-gray-900 mb-6">
             Manos Library

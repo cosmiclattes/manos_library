@@ -131,12 +131,12 @@ export default function ProfilePage() {
 
             {/* Usage Example */}
             {accessToken && (
-              <div className="mt-6 p-4 bg-blue-50 rounded-md border border-blue-200">
-                <h3 className="text-sm font-medium text-blue-900 mb-2">Usage Example</h3>
-                <p className="text-xs text-blue-800 mb-2">
+              <div className="mt-6 p-4 bg-secondary rounded-md border border-secondary">
+                <h3 className="text-sm font-medium text-secondary-foreground mb-2">Usage Example</h3>
+                <p className="text-xs text-secondary-foreground mb-2">
                   Use this token with the add_sample_data.py script:
                 </p>
-                <code className="block p-2 bg-white rounded text-xs font-mono text-gray-800 border border-blue-300">
+                <code className="block p-2 bg-white rounded text-xs font-mono text-gray-800 border border-border">
                   python add_sample_data.py {accessToken.substring(0, 20)}...
                 </code>
               </div>

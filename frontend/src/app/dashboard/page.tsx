@@ -68,7 +68,7 @@ export default function DashboardPage() {
             <CardHeader>
               <div className="flex justify-between items-start">
                 <CardTitle>Browse Books</CardTitle>
-                <BookOpen className="h-8 w-8 text-blue-600" />
+                <BookOpen className="h-8 w-8 text-primary" />
               </div>
             </CardHeader>
             <CardContent>
@@ -86,7 +86,7 @@ export default function DashboardPage() {
             <CardHeader>
               <div className="flex justify-between items-start">
                 <CardTitle>My Borrowed Books</CardTitle>
-                <Users className="h-8 w-8 text-blue-600" />
+                <Users className="h-8 w-8 text-primary" />
               </div>
             </CardHeader>
             <CardContent>
@@ -104,7 +104,7 @@ export default function DashboardPage() {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <CardTitle>Manage Library</CardTitle>
-                  <Library className="h-8 w-8 text-blue-600" />
+                  <Library className="h-8 w-8 text-primary" />
                 </div>
               </CardHeader>
               <CardContent>
@@ -119,11 +119,11 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <Card className="bg-blue-50 border-blue-200">
+        <Card className="bg-secondary border-secondary">
           <CardHeader>
-            <CardTitle className="text-blue-900">Quick Start Guide</CardTitle>
+            <CardTitle className="text-secondary-foreground">Quick Start Guide</CardTitle>
           </CardHeader>
-          <CardContent className="text-blue-800">
+          <CardContent className="text-secondary-foreground">
             <ul className="list-disc list-inside space-y-2">
               <li>Click "Browse Books" to see all available books</li>
               <li>Use the search feature to find specific books</li>

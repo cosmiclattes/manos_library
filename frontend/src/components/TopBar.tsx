@@ -42,8 +42,8 @@ export default function TopBar({ user }: TopBarProps) {
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         {/* Left side - Logo/Title */}
         <div className="flex items-center gap-2">
-          <Library className="h-6 w-6 text-blue-600" />
-          <span className="text-xl font-semibold text-gray-900">
+          <Library className="h-6 w-6 text-primary" />
+          <span className="text-xl font-semibold text-foreground">
             Library
           </span>
         </div>
@@ -53,7 +53,7 @@ export default function TopBar({ user }: TopBarProps) {
           <DropdownMenuTrigger onClick={() => setDropdownOpen(!dropdownOpen)}>
             <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               {/* Avatar with initial */}
-              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold cursor-pointer hover:bg-blue-700 transition-colors">
+              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold cursor-pointer hover:bg-primary/90 transition-colors">
                 {getInitial(user.name)}
               </div>
             </button>

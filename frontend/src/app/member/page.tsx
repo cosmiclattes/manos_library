@@ -212,7 +212,7 @@ export default function MemberDashboardPage() {
             onClick={() => handleViewChange('all-books')}
             className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-3 transition-colors ${
               currentView === 'all-books'
-                ? 'bg-blue-50 text-blue-700 font-medium'
+                ? 'bg-secondary text-secondary-foreground font-medium'
                 : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -224,7 +224,7 @@ export default function MemberDashboardPage() {
             onClick={() => handleViewChange('borrowed-books')}
             className={`w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition-colors ${
               currentView === 'borrowed-books'
-                ? 'bg-blue-50 text-blue-700 font-medium'
+                ? 'bg-secondary text-secondary-foreground font-medium'
                 : 'text-gray-700 hover:bg-gray-50'
             }`}
           >

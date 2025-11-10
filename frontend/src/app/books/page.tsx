@@ -126,7 +126,7 @@ export default function BooksPage() {
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <BookOpen className="h-6 w-6 text-blue-600" />
+            <BookOpen className="h-6 w-6 text-primary" />
             <h1 className="text-2xl font-bold text-gray-900">Library Books</h1>
           </div>
           <div className="flex gap-2">

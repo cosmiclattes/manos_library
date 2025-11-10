@@ -391,7 +391,7 @@ export default function LibrarianDashboardPage() {
             onClick={() => setCurrentView('all-books')}
             className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-3 transition-colors ${
               currentView === 'all-books'
-                ? 'bg-blue-50 text-blue-700 font-medium'
+                ? 'bg-secondary text-secondary-foreground font-medium'
                 : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -411,7 +411,7 @@ export default function LibrarianDashboardPage() {
             onClick={() => handleViewChange('users')}
             className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-3 transition-colors ${
               currentView === 'users'
-                ? 'bg-blue-50 text-blue-700 font-medium'
+                ? 'bg-secondary text-secondary-foreground font-medium'
                 : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -575,7 +575,7 @@ export default function LibrarianDashboardPage() {
                       title="Total Books"
                       value={stats.total_books}
                       icon={BookOpen}
-                      iconColor="text-blue-600"
+                      iconColor="text-primary"
                     />
                     <StatCard
                       title="Total Users"
