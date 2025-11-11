@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Search, BookOpen, Library, Loader2 } from 'lucide-react';
 import TopBar from '@/components/TopBar';
+import Sidebar, { NavItem } from '@/components/Sidebar';
 import { Pagination } from '@/components/ui/pagination';
 import { useToast } from '@/hooks/useToast';
 import { Toast } from '@/components/ui/toast';
@@ -184,6 +185,22 @@ export default function MemberDashboardPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Define navigation items for sidebar
+  const navItems: NavItem[] = [
+    {
+      id: 'all-books',
+      label: 'All Books',
+      icon: BookOpen,
+      onClick: () => handleViewChange('all-books'),
+    },
+    {
+      id: 'borrowed-books',
+      label: 'Borrowed Books',
+      icon: Library,
+      onClick: () => handleViewChange('borrowed-books'),
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Toast Notifications */}
@@ -198,41 +215,7 @@ export default function MemberDashboardPage() {
 
       <TopBar user={user} />
       <div className="flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md border-r flex flex-col">
-        <div className="p-6 border-b">
-          <p className="text-sm text-gray-600">{user?.name}</p>
-          <Badge variant="outline" className="mt-2">
-            {user?.user_type.replace('_', ' ')}
-          </Badge>
-        </div>
-
-        <nav className="flex-1 p-4">
-          <button
-            onClick={() => handleViewChange('all-books')}
-            className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-3 transition-colors ${
-              currentView === 'all-books'
-                ? 'bg-secondary text-secondary-foreground font-medium'
-                : 'text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            <BookOpen className="h-5 w-5" />
-            All Books
-          </button>
-
-          <button
-            onClick={() => handleViewChange('borrowed-books')}
-            className={`w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition-colors ${
-              currentView === 'borrowed-books'
-                ? 'bg-secondary text-secondary-foreground font-medium'
-                : 'text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            <Library className="h-5 w-5" />
-            Borrowed Books
-          </button>
-        </nav>
-      </aside>
+        <Sidebar user={user} navItems={navItems} currentView={currentView} />
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto">

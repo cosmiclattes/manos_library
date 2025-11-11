@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { Search, BookOpen, Library, Plus, Edit, Package, Users, BookMarked, Loader2 } from 'lucide-react';
 import TopBar from '@/components/TopBar';
+import Sidebar, { NavItem } from '@/components/Sidebar';
 import { Pagination } from '@/components/ui/pagination';
 import StatCard from '@/components/StatCard';
 import { useToast } from '@/hooks/useToast';
@@ -363,6 +364,28 @@ export default function LibrarianDashboardPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Define navigation items for sidebar
+  const navItems: NavItem[] = [
+    {
+      id: 'all-books',
+      label: 'All Books',
+      icon: BookOpen,
+      onClick: () => setCurrentView('all-books'),
+    },
+    {
+      id: 'add-book',
+      label: 'Add Book',
+      icon: Plus,
+      onClick: () => handleViewChange('add-book'),
+    },
+    {
+      id: 'users',
+      label: 'Manage Users',
+      icon: Users,
+      onClick: () => handleViewChange('users'),
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Toast Notifications */}
@@ -377,49 +400,7 @@ export default function LibrarianDashboardPage() {
 
       <TopBar user={user} />
       <div className="flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md border-r flex flex-col">
-        <div className="p-6 border-b">
-          <p className="text-sm text-gray-600">{user?.name}</p>
-          <Badge variant="outline" className="mt-2">
-            {user?.user_type.replace('_', ' ')}
-          </Badge>
-        </div>
-
-        <nav className="flex-1 p-4">
-          <button
-            onClick={() => setCurrentView('all-books')}
-            className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-3 transition-colors ${
-              currentView === 'all-books'
-                ? 'bg-secondary text-secondary-foreground font-medium'
-                : 'text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            <BookOpen className="h-5 w-5" />
-            All Books
-          </button>
-
-          <button
-            onClick={() => handleViewChange('add-book')}
-            className="w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition-colors text-gray-700 hover:bg-gray-50"
-          >
-            <Plus className="h-5 w-5" />
-            Add Book
-          </button>
-
-          <button
-            onClick={() => handleViewChange('users')}
-            className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-3 transition-colors ${
-              currentView === 'users'
-                ? 'bg-secondary text-secondary-foreground font-medium'
-                : 'text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            <Users className="h-5 w-5" />
-            Manage Users
-          </button>
-        </nav>
-      </aside>
+        <Sidebar user={user} navItems={navItems} currentView={currentView} />
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
